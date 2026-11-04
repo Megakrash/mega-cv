@@ -1,0 +1,7 @@
+# Build artifacts
+dist
+.astro
+
+# pnpm owns the lockfile format; Prettier rewrites it and pnpm undoes it on
+# every install, producing thousands of spurious diff lines per dep bump.
+pnpm-lock.yaml
