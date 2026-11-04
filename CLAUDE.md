@@ -8,6 +8,10 @@ simplest solution that works; avoid abstractions the site does not need yet.
 
 - Astro 7 (static output) + TypeScript strict. Plain CSS: global tokens in
   `src/styles/global.css`, scoped `<style>` blocks in components. No UI framework.
+- Themes: each color token is declared once with `light-dark()`. The page follows the system
+  theme unless the header toggle stores a choice, applied before the first paint by the blocking
+  `public/theme-init.js` (`<html data-theme>`). Animations only run under
+  `prefers-reduced-motion: no-preference`.
 - Node 24 (`.nvmrc`), pnpm through corepack (`packageManager` in `package.json`).
 - `pnpm dev` (http://localhost:4321), `pnpm build`, `pnpm check` (astro check), `pnpm lint` (zero
   warnings), `pnpm format:check`. Formatting is owned by Prettier and ESLint.
@@ -17,7 +21,9 @@ simplest solution that works; avoid abstractions the site does not need yet.
 ## i18n
 
 French is the default locale at `/`, English lives under `/en/`. Every page exists in both
-languages; UI strings live in `src/i18n/ui.ts`, typed for both locales.
+languages. UI strings (including the home page sections, their anchors and order) live in
+`src/i18n/ui.ts`; the profile content shared by the site and the CV lives in
+`src/data/profile.ts`. Both are typed for both locales.
 
 ## Conventions
 
@@ -33,7 +39,11 @@ languages; UI strings live in `src/i18n/ui.ts`, typed for both locales.
 - The repository is public: never commit personal data. Personal source documents dropped at the
   repo root (photo, old CV) are gitignored; only web-optimized derivatives get committed.
 - The CSP is enforced (`docker/security-headers.conf`): no inline `<script>`, `<style>` or `style`
-  attribute, no third-party origin. Keep `build.inlineStylesheets: 'never'` in the Astro config.
+  attribute, no third-party origin. Keep `build.inlineStylesheets: 'never'` and
+  `vite.build.assetsInlineLimit: 0` in the Astro config (otherwise Astro inlines small component
+  scripts and Vite turns small files into `data:` URIs). Fonts come from the `@fontsource`
+  packages imported in `BaseLayout`; never use Astro's `<Font>` component (it renders an inline
+  `<style>`).
 - nginx does not merge `add_header` levels: a location that sets its own `add_header` must include
   the security-headers snippet again.
 - No external error tracking or analytics service.

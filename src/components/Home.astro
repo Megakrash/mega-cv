@@ -1,0 +1,21 @@
+---
+import { SECTION_KEYS, UI, type Lang } from '../i18n/ui'
+
+import Hero from './Hero.astro'
+import Section from './Section.astro'
+
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+const t = UI[lang]
+---
+
+<Hero lang={lang} />
+{
+  // Section contents are still to come: for now each is its title and anchor.
+  SECTION_KEYS.map((key, i) => (
+    <Section id={t.sections[key].id} index={i + 1} title={t.sections[key].label} />
+  ))
+}

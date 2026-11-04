@@ -1,6 +1,6 @@
 {
   "name": "mega-cv",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Personal portfolio and CV of Jonathan Scattolini",
   "type": "module",
   "private": true,
@@ -17,6 +17,8 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource-variable/geist-mono": "^5.3.0",
     "astro": "^7.4.5"
   },
   "devDependencies": {

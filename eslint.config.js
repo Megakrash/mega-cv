@@ -59,6 +59,19 @@ export default defineConfig(
     },
   },
 
+  // Classic browser scripts served as is from public/ (neither bundled nor
+  // type-checked): declare the few browser globals they use.
+  {
+    files: ['public/**/*.js'],
+    languageOptions: {
+      sourceType: 'script',
+      globals: {
+        document: 'readonly',
+        localStorage: 'readonly',
+      },
+    },
+  },
+
   // Prettier config (must be last to override conflicting rules)
   prettierConfig
 )

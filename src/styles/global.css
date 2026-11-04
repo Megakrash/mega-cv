@@ -1,14 +1,78 @@
-/* Provisional base styles: the real visual identity comes with lot 3. */
+/*
+ * Design tokens and base styles.
+ *
+ * Every color is declared once with light-dark(<light>, <dark>): the page
+ * follows the system theme (color-scheme: light dark) unless the header toggle
+ * forces one through <html data-theme>, set before the first paint by
+ * public/theme-init.js. Contrast ratios (WCAG) are noted next to the text
+ * colors; all of them reach AA (4.5:1).
+ */
 
 :root {
-  --color-bg: #0a0e14;
-  --color-text: #e6e6e6;
-  --color-muted: #9aa4b2;
-  /* Orange of mega-series' primary color. */
-  --color-accent: #e8590c;
-  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  color-scheme: light dark;
 
+  /* Colors */
+  --color-bg: light-dark(#f7f8fa, #0a0e14);
+  --color-surface: light-dark(#ffffff, #111722);
+  --color-surface-2: light-dark(#eef0f4, #161d2a);
+  --color-border: light-dark(#dde1e8, #263042);
+  /* 16.6 / 15.9 on bg */
+  --color-text: light-dark(#141922, #e6e9ef);
+  /* at least 5.6 / 6.7 on bg and both surfaces */
+  --color-muted: light-dark(#566070, #9aa4b2);
+  /* Orange of the old CV, for fills only (button, avatar ring, glow): as text
+     it only reaches 2:1 on the light background, hence --color-accent-text. */
+  --color-accent: #f89b22;
+  /* at least 4.75 / 8.3 on bg and both surfaces; also the focus ring */
+  --color-accent-text: light-dark(#a85200, #f89b22);
+  /* 8.9 on the accent */
+  --color-on-accent: #0a0e14;
+  /* 5.3 / 11.1 on surface */
+  --color-syntax-string: light-dark(#2f7a3a, #a3d9a5);
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+
+  /* Radii */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* Typography (fonts self-hosted from the @fontsource packages) */
+  --font-sans: 'Geist Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
+  --text-hero: clamp(2.5rem, 1.5rem + 4vw, 4.25rem);
+
+  /* Layout */
+  --container: 72rem;
+  --gutter: clamp(1rem, 4vw, 2rem);
+  --header-h: 4rem;
+
+  /* Motion (only used under prefers-reduced-motion: no-preference) */
+  --dur-fast: 150ms;
+  --dur: 400ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
   color-scheme: dark;
 }
 
@@ -21,6 +85,8 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* Anchors land below the sticky header. */
+  scroll-padding-top: var(--header-h);
 }
 
 body {
@@ -32,14 +98,70 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
+  font-size: var(--text-base);
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+main {
+  flex: 1;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
 }
 
 a {
   color: inherit;
 }
 
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-accent-text);
   outline-offset: 3px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
+
+/* Utilities */
+
+.container {
+  width: 100%;
+  max-width: calc(var(--container) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Motion: everything animated opts in here, so reduced motion means none. */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    transition:
+      background-color var(--dur-fast),
+      color var(--dur-fast);
+  }
 }

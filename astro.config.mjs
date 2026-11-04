@@ -16,4 +16,14 @@ export default defineConfig({
     // blocks inline <style> blocks.
     inlineStylesheets: 'never',
   },
+
+  vite: {
+    build: {
+      // Never inline anything, for the same CSP: below this limit Astro would
+      // inline small component <script>s into the page (script-src 'self'), and
+      // Vite would turn small files such as font subsets into data: URIs
+      // (font-src 'self').
+      assetsInlineLimit: 0,
+    },
+  },
 })
