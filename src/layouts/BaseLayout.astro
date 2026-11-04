@@ -1,0 +1,33 @@
+---
+import SiteFooter from '../components/SiteFooter.astro'
+import { HOME_PATHS, UI, type Lang } from '../i18n/ui'
+import '../styles/global.css'
+
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+const t = UI[lang]
+const site = Astro.site
+if (!site) throw new Error('`site` must be set in astro.config.mjs (used for the hreflang links).')
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{t.metaTitle}</title>
+    <meta name="description" content={t.metaDescription} />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate" hreflang="fr" href={new URL(HOME_PATHS.fr, site)} />
+    <link rel="alternate" hreflang="en" href={new URL(HOME_PATHS.en, site)} />
+    <link rel="alternate" hreflang="x-default" href={new URL(HOME_PATHS.fr, site)} />
+  </head>
+  <body>
+    <slot />
+    <SiteFooter lang={lang} />
+  </body>
+</html>

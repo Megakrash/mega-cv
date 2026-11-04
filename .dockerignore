@@ -1,0 +1,29 @@
+# Never copy host build artifacts / deps into the build context.
+**/node_modules
+**/dist
+**/.astro
+**/.git
+**/*.tsbuildinfo
+.pnpm-store
+
+# Not needed to build the image.
+.github
+.husky
+.claude
+
+# Personal source documents dropped at the repo root (never in an image).
+/*.pdf
+/*.jpg
+/*.jpeg
+/*.png
+/*.webp
+/*.heic
+
+# Secrets — nothing is injected at build time; keep any env file out anyway.
+**/.env
+**/.env.*
+
+# Editor / OS
+**/.DS_Store
+**/.idea
+**/*.swp

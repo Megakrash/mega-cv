@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+.astro/
+*.tsbuildinfo
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Local Claude Code settings (per-machine permissions, never shared)
+.claude/settings.local.json
+
+# Editor / OS
+.DS_Store
+.idea/
+*.swp
+
+# Personal source documents dropped at the repo root (never committed)
+/*.pdf
+/*.jpg
+/*.jpeg
+/*.png
+/*.webp
+/*.heic

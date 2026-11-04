@@ -1,0 +1,52 @@
+name: Open Release PR
+
+on:
+  push:
+    branches: [dev]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  open_release_pr:
+    name: Open dev → main PR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Create or retitle the PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          # A package.json version that is not tagged yet is the release this
+          # PR ships (release.yml tags it once merged): say so in the title.
+          VERSION="v$(jq -r .version package.json)"
+          if ! git ls-remote --exit-code --tags origin "refs/tags/${VERSION}" >/dev/null; then
+            TITLE="PR Dev ${VERSION} into Main"
+          else
+            TITLE="Release: merge dev into main"
+          fi
+
+          # One rolling release PR: while a dev → main PR is open, every new
+          # push to dev lands on it automatically — only its title may change.
+          PR_NUMBER="$(gh pr list --base main --head dev --state open --json number --jq '.[0].number // empty')"
+          if [[ -n "${PR_NUMBER}" ]]; then
+            CURRENT="$(gh pr view "${PR_NUMBER}" --json title --jq .title)"
+            if [[ "${CURRENT}" != "${TITLE}" ]]; then
+              gh pr edit "${PR_NUMBER}" --title "${TITLE}"
+              echo "PR #${PR_NUMBER} renamed to: ${TITLE}"
+            fi
+            exit 0
+          fi
+
+          gh pr create \
+            --base main \
+            --head dev \
+            --title "${TITLE}" \
+            --body "Opened automatically on push to \`dev\`. Merging into \`main\` triggers the Coolify deploy, plus the tag and GitHub release when the \`package.json\` version is new." \
+            --assignee "${{ github.repository_owner }}"

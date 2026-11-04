@@ -1,0 +1,49 @@
+name: Checks
+
+on:
+  push:
+    branches: [main, dev]
+
+# Cancel an in-progress run when a newer commit is pushed to the same branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Lint, type-check and build
+    runs-on: ubuntu-latest
+    env:
+      ASTRO_TELEMETRY_DISABLED: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # pnpm 12 support landed in v6.1.0; the floating `v6` tag still points at
+      # v6.0.10, so the exact tag is pinned. The version comes from packageManager.
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6.1.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          # Single source of truth for the Node version (also used by the
+          # Dockerfile and local nvm).
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format
+        run: pnpm format:check
+
+      - name: Type-check (astro check)
+        run: pnpm check
+
+      # Catches build-only regressions before the Docker build on deploy does.
+      - name: Build
+        run: pnpm build

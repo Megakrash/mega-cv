@@ -1,0 +1,37 @@
+---
+import { UI, type Lang } from '../i18n/ui'
+import { APP_VERSION, RELEASE_URL } from '../lib/version'
+
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+---
+
+<footer class="footer">
+  <a
+    class="footer__version"
+    href={RELEASE_URL}
+    aria-label={`${UI[lang].versionLabel} ${APP_VERSION}`}
+  >
+    {APP_VERSION}
+  </a>
+</footer>
+
+<style>
+  .footer {
+    padding: 1.5rem 1rem;
+    text-align: center;
+  }
+  .footer__version {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-muted);
+    text-decoration: none;
+  }
+  .footer__version:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+</style>

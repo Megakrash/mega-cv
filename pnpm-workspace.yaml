@@ -1,0 +1,9 @@
+# Single-package repo: this file only holds pnpm settings (no `packages`).
+
+# pnpm 12 records its own version in a leading "env" document of
+# pnpm-lock.yaml. GitHub's dependency graph only reads that first document, so
+# it would see zero dependencies and auto-close every Dependabot alert as
+# "fixed" (dependabot-core#15904). `ignore` keeps the lockfile single-document;
+# the pnpm version is still enforced by corepack (local + Docker) and
+# pnpm/action-setup (CI), which both read `packageManager` from package.json.
+pmOnFail: ignore
