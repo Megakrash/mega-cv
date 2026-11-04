@@ -185,8 +185,12 @@ Enchaîne directement, sans rien proposer ni attendre :
 
 ```bash
 git add <fichiers>
-git commit -m "type: :gitmoji: description"
+git commit -m "type: :gitmoji: description" -m "Co-Authored-By: Claude <Modèle> <noreply@anthropic.com>"
 ```
+
+Le second `-m` ajoute le trailer de co-auteur Claude en pied de message (séparé du titre par une
+ligne vide). Utilise le nom du modèle en cours, par exemple
+`Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
 
 3. Si un hook (lint-staged, commitlint) échoue, corrige la cause (message non conforme,
    erreur de lint) puis relance le commit. Ne contourne jamais le hook.
@@ -216,7 +220,7 @@ ni `--force`, ni rebase/merge de ta propre initiative.
 
 - Ne JAMAIS demander de validation (découpage, messages ou push) : tout s'exécute d'un trait
 - Ne jamais commiter un fichier de secrets (`.env`, clés, tokens) : laisse-le hors des commits et signale-le dans le compte rendu
-- Ne JAMAIS ajouter de `Co-Authored-By` ou se mettre en co-auteur des commits
+- Toujours ajouter le trailer `Co-Authored-By: Claude <Modèle> <noreply@anthropic.com>` à chaque commit (voir étape 4)
 - Ne jamais utiliser `--force` ou `--no-verify`
 - Ne jamais modifier la config git
 - Les messages de commit sont TOUJOURS en anglais
