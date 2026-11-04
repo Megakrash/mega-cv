@@ -1,0 +1,286 @@
+---
+import { Picture } from 'astro:assets'
+
+import photo from '../assets/photo.jpg'
+import { PROFILE } from '../data/profile'
+import { UI, sectionHref, type Lang } from '../i18n/ui'
+
+import Button from './Button.astro'
+import TerminalWindow from './TerminalWindow.astro'
+
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+const profile = PROFILE[lang]
+const t = UI[lang]
+
+// whoami.json card: keys stay in English (it is code), values are localized.
+// Each value becomes highlighted lines: one per entry, one per array item.
+const whoami: Record<string, string | readonly string[]> = {
+  name: profile.name,
+  role: profile.jobTitle,
+  location: profile.location,
+  focus: profile.focus,
+  status: profile.status,
+}
+
+type Token = { kind: 'key' | 'string' | 'punct'; text: string }
+type Line = { indent: number; tokens: Token[] }
+
+const punct = (text: string): Token => ({ kind: 'punct', text })
+const string = (text: string): Token => ({ kind: 'string', text: `"${text}"` })
+const comma = (isLast: boolean): Token[] => (isLast ? [] : [punct(',')])
+
+const entries = Object.entries(whoami)
+const lines: Line[] = [{ indent: 0, tokens: [punct('{')] }]
+entries.forEach(([key, value], i) => {
+  const isLast = i === entries.length - 1
+  const keyTokens: Token[] = [{ kind: 'key', text: `"${key}"` }, punct(': ')]
+  if (typeof value === 'string') {
+    lines.push({ indent: 1, tokens: [...keyTokens, string(value), ...comma(isLast)] })
+    return
+  }
+  lines.push({ indent: 1, tokens: [...keyTokens, punct('[')] })
+  value.forEach((item, j) => {
+    lines.push({ indent: 2, tokens: [string(item), ...comma(j === value.length - 1)] })
+  })
+  lines.push({ indent: 1, tokens: [punct(']'), ...comma(isLast)] })
+})
+lines.push({ indent: 0, tokens: [punct('}')] })
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero__inner container">
+    <div class="hero__intro">
+      <div class="hero__avatar">
+        <Picture
+          src={photo}
+          formats={['avif', 'webp']}
+          widths={[160, 320]}
+          sizes="160px"
+          alt={t.photoAlt}
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+
+      <p class="hero__badge">
+        <span class="hero__dot" aria-hidden="true"></span>
+        {profile.status} · {profile.lookingFor}
+      </p>
+
+      <h1 class="hero__name" id="hero-title">
+        {profile.name}
+      </h1>
+      <p class="hero__title">
+        {profile.jobTitle}
+        <span class="hero__cursor" aria-hidden="true">
+          ▍
+        </span>
+      </p>
+      <p class="hero__tagline">{profile.tagline}</p>
+      <p class="hero__pitch">{profile.pitch}</p>
+
+      <div class="hero__actions">
+        <Button href={sectionHref(lang, 'contact')}>{t.ctaContact}</Button>
+        <Button href={sectionHref(lang, 'experience')} variant="ghost">
+          {t.ctaExperience}
+        </Button>
+      </div>
+    </div>
+
+    <div class="hero__card">
+      <TerminalWindow title="whoami.json">
+        <code class="json">
+          {lines.map((line) => (
+            <span class={`json__line json__line--${line.indent}`}>
+              {line.tokens.map((token) => (
+                <span class={`json__${token.kind}`}>{token.text}</span>
+              ))}
+            </span>
+          ))}
+        </code>
+      </TerminalWindow>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding-block: var(--space-8) var(--space-9);
+    --grid-line: color-mix(in srgb, var(--color-text) 7%, transparent);
+    --glow: light-dark(rgb(248 155 34 / 16%), rgb(248 155 34 / 22%));
+  }
+  /* Faint grid fading out towards the edges. */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 3rem 3rem;
+    mask-image: radial-gradient(ellipse 70% 65% at 50% 40%, #000 20%, transparent 75%);
+  }
+  /* Orange glow coming down from the top of the page, right below the header. */
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: -1;
+    height: 32rem;
+    background: radial-gradient(ellipse 55% 100% at 50% 0%, var(--glow), transparent 70%);
+  }
+
+  .hero__inner {
+    display: grid;
+    gap: var(--space-7);
+  }
+
+  .hero__avatar {
+    width: 8rem;
+    margin-bottom: var(--space-5);
+    padding: 4px;
+    border: 2px solid var(--color-accent);
+    border-radius: 50%;
+  }
+  .hero__avatar :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 50%;
+  }
+
+  .hero__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-4);
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid var(--color-border);
+    /* Not a pill: the text may wrap on narrow screens. */
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+  }
+  .hero__dot {
+    flex: none;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+
+  .hero__name {
+    margin: 0;
+    font-size: var(--text-hero);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+  .hero__title {
+    margin: var(--space-3) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-xl);
+    font-weight: 500;
+    color: var(--color-accent-text);
+  }
+  .hero__tagline {
+    margin: var(--space-2) 0 0;
+    font-size: var(--text-lg);
+    color: var(--color-muted);
+  }
+  .hero__pitch {
+    max-width: 36rem;
+    margin: var(--space-5) 0 0;
+    font-size: var(--text-lg);
+  }
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+
+  .json {
+    display: block;
+    font-family: inherit;
+  }
+  .json__line {
+    display: block;
+    /* Hanging indent: a value too long for the card wraps under itself. */
+    padding-left: calc(var(--indent) + 2ch);
+    text-indent: -2ch;
+    --indent: 0ch;
+  }
+  .json__line--1 {
+    --indent: 2ch;
+  }
+  .json__line--2 {
+    --indent: 4ch;
+  }
+  .json__key {
+    color: var(--color-accent-text);
+  }
+  .json__string {
+    color: var(--color-syntax-string);
+  }
+  .json__punct {
+    color: var(--color-muted);
+  }
+
+  @media (min-width: 48rem) {
+    .hero__avatar {
+      width: 10rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .hero {
+      display: grid;
+      align-content: center;
+      min-height: min(calc(100svh - var(--header-h)), 56rem);
+    }
+    .hero__inner {
+      grid-template-columns: 1.15fr 1fr;
+      align-items: center;
+      gap: var(--space-8);
+    }
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  @keyframes pulse {
+    from {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 60%, transparent);
+    }
+    to {
+      box-shadow: 0 0 0 0.5rem transparent;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__intro {
+      animation: fade-up var(--dur) var(--ease-out) both;
+    }
+    .hero__card {
+      animation: fade-up var(--dur) var(--ease-out) 150ms both;
+    }
+    .hero__cursor {
+      animation: blink 1.1s steps(1) infinite;
+    }
+    .hero__dot {
+      animation: pulse 2s var(--ease-out) infinite;
+    }
+  }
+</style>

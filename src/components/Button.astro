@@ -1,0 +1,66 @@
+---
+/** A call-to-action: a link when `href` is given, a plain button otherwise. */
+interface Props {
+  href?: string
+  variant?: 'primary' | 'ghost'
+}
+
+const { href, variant = 'primary' } = Astro.props
+const classes = ['button', `button--${variant}`]
+---
+
+{href ? (
+  <a class:list={classes} href={href}>
+    <slot />
+  </a>
+) : (
+  <button class:list={classes} type="button">
+    <slot />
+  </button>
+)}
+
+<style>
+  .button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-5);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    font: inherit;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    line-height: 1.4;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .button--primary {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+  .button--primary:hover {
+    /* Lighter on the dark theme, darker on the light one; --color-on-accent
+       stays above 6:1 on both. */
+    background: color-mix(in srgb, var(--color-accent) 85%, var(--color-text));
+  }
+  .button--ghost {
+    border-color: var(--color-border);
+    background: none;
+    color: var(--color-text);
+  }
+  .button--ghost:hover {
+    border-color: var(--color-accent-text);
+    color: var(--color-accent-text);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .button {
+      transition:
+        background-color var(--dur-fast),
+        border-color var(--dur-fast),
+        color var(--dur-fast);
+    }
+  }
+</style>

@@ -1,0 +1,238 @@
+---
+import { HOME_PATHS, LANGS, SECTION_KEYS, UI, sectionHref, type Lang } from '../i18n/ui'
+
+import ThemeToggle from './ThemeToggle.astro'
+
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+const t = UI[lang]
+const links = SECTION_KEYS.map((key) => ({
+  href: sectionHref(lang, key),
+  label: t.sections[key].label,
+}))
+---
+
+<header class="header">
+  <div class="header__inner container">
+    <a class="logo" href={HOME_PATHS[lang]} aria-label={t.homeLabel}>
+      <span class="logo__path">~/</span>jonathan
+    </a>
+
+    <nav class="nav" aria-label={t.navLabel}>
+      <ul class="nav__list">
+        {links.map((link) => (
+          <li>
+            <a class="nav__link" href={link.href}>
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="header__controls">
+      <p class="lang">
+        {LANGS.map((code, i) => [
+          i > 0 && (
+            <span class="lang__separator" aria-hidden="true">
+              /
+            </span>
+          ),
+          code === lang ? (
+            <span class="lang__current" aria-hidden="true">
+              {code.toUpperCase()}
+            </span>
+          ) : (
+            <a
+              class="lang__link"
+              href={HOME_PATHS[code]}
+              hreflang={code}
+              lang={code}
+              aria-label={t.switchLanguage}
+            >
+              {code.toUpperCase()}
+            </a>
+          ),
+        ])}
+      </p>
+      <ThemeToggle lang={lang} />
+      <button class="menu-button" type="button" popovertarget="site-menu" aria-label={t.menuLabel}>
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path
+            d="M4 7h16M4 12h16M4 17h16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          ></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="menu" id="site-menu" popover>
+    <nav aria-label={t.navLabel}>
+      <ul class="menu__list">
+        {links.map((link) => (
+          <li>
+            <a class="menu__link" href={link.href}>
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<script>
+  // The popover opens and closes natively (button, Escape, click outside);
+  // following one of its links must close it too.
+  const menu = document.getElementById('site-menu')
+  menu?.addEventListener('click', (event) => {
+    if (event.target instanceof Element && event.target.closest('a')) menu.hidePopover()
+  })
+</script>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-bottom: 1px solid var(--color-border);
+    background: color-mix(in srgb, var(--color-bg) 85%, transparent);
+    backdrop-filter: blur(12px);
+  }
+  .header__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    height: var(--header-h);
+  }
+
+  .logo {
+    font-family: var(--font-mono);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .logo__path {
+    color: var(--color-accent-text);
+  }
+  .logo:hover {
+    color: var(--color-accent-text);
+  }
+
+  .nav {
+    display: none;
+    margin-left: auto;
+  }
+  .nav__list,
+  .menu__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .nav__list {
+    display: flex;
+    gap: var(--space-5);
+  }
+  .nav__link,
+  .menu__link {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+    text-decoration: none;
+  }
+  .nav__link:hover,
+  .menu__link:hover {
+    color: var(--color-accent-text);
+  }
+
+  .header__controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-left: auto;
+  }
+
+  .lang {
+    display: flex;
+    gap: var(--space-1);
+    margin: 0 var(--space-2) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
+  .lang__current {
+    color: var(--color-accent-text);
+    font-weight: 600;
+  }
+  .lang__link {
+    text-decoration: none;
+  }
+  .lang__link:hover {
+    color: var(--color-accent-text);
+    text-decoration: underline;
+  }
+
+  .menu-button {
+    display: inline-grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: none;
+    color: var(--color-text);
+    cursor: pointer;
+  }
+  .menu-button:hover {
+    color: var(--color-accent-text);
+  }
+
+  /* Mobile menu: a popover panel right below the header. */
+  .menu {
+    position: fixed;
+    inset: var(--header-h) 0 auto;
+    width: auto;
+    margin: 0;
+    padding: var(--space-4) var(--gutter) var(--space-6);
+    border: 0;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+  .menu::backdrop {
+    background: color-mix(in srgb, var(--color-bg) 60%, transparent);
+  }
+  .menu__link {
+    display: block;
+    padding: var(--space-3) 0;
+    font-size: var(--text-base);
+  }
+
+  @media (min-width: 64rem) {
+    .nav {
+      display: block;
+    }
+    .header__controls {
+      margin-left: 0;
+    }
+    .menu-button,
+    .menu {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .menu:popover-open {
+      animation: fade-up var(--dur-fast) var(--ease-out);
+    }
+  }
+</style>
