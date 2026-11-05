@@ -34,8 +34,8 @@ languages. UI strings (including the home page sections, their anchors and order
 - French typography: typographic apostrophe `’` (never `'`), no-break space before `:` and inside
   `« »`, narrow no-break space before `;`, `!` and `?`. In TS strings, write them as `\u00a0`
   and `\u202f` so they stay visible in the source.
-- The email address and the phone number are never written in static HTML: they are assembled in
-  JavaScript and revealed on click. The CV never shows the phone number.
+- The email address is never written in static HTML: it is assembled in JavaScript and revealed
+  on click. No phone number anywhere, neither on the site nor on the CV.
 - The repository is public: never commit personal data. Personal source documents dropped at the
   repo root (photo, old CV) are gitignored; only web-optimized derivatives get committed.
 - The CSP is enforced (`docker/security-headers.conf`): no inline `<script>`, `<style>` or `style`
