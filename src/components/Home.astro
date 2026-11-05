@@ -1,8 +1,14 @@
 ---
-import { SECTION_KEYS, UI, type Lang } from '../i18n/ui'
+import { SECTION_KEYS, UI, type Lang, type SectionKey } from '../i18n/ui'
 
+import About from './About.astro'
+import BeforeCode from './BeforeCode.astro'
+import Contact from './Contact.astro'
+import Experience from './Experience.astro'
 import Hero from './Hero.astro'
+import Projects from './Projects.astro'
 import Section from './Section.astro'
+import Skills from './Skills.astro'
 
 interface Props {
   lang: Lang
@@ -10,12 +16,24 @@ interface Props {
 
 const { lang } = Astro.props
 const t = UI[lang]
+
+// Content of each section; SECTION_KEYS alone sets their order.
+const CONTENT = {
+  about: About,
+  skills: Skills,
+  experience: Experience,
+  beforeCode: BeforeCode,
+  projects: Projects,
+  contact: Contact,
+} satisfies Record<SectionKey, (props: { lang: Lang }) => unknown>
 ---
 
 <Hero lang={lang} />
-{
-  // Section contents are still to come: for now each is its title and anchor.
-  SECTION_KEYS.map((key, i) => (
-    <Section id={t.sections[key].id} index={i + 1} title={t.sections[key].label} />
-  ))
-}
+{SECTION_KEYS.map((key, i) => {
+  const Content = CONTENT[key]
+  return (
+    <Section id={t.sections[key].id} index={i + 1} title={t.sections[key].label}>
+      <Content lang={lang} />
+    </Section>
+  )
+})}

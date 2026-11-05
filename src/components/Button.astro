@@ -3,18 +3,29 @@
 interface Props {
   href?: string
   variant?: 'primary' | 'ghost'
+  /** Link to another site: opens in a new tab. */
+  external?: boolean
+  hidden?: boolean
+  /** Hooks for the client scripts, e.g. `data-email-reveal`. */
+  [data: `data-${string}`]: string | boolean | undefined
 }
 
-const { href, variant = 'primary' } = Astro.props
+const { href, variant = 'primary', external = false, ...attributes } = Astro.props
 const classes = ['button', `button--${variant}`]
 ---
 
 {href ? (
-  <a class:list={classes} href={href}>
+  <a
+    class:list={classes}
+    href={href}
+    target={external ? '_blank' : undefined}
+    rel={external ? 'noopener noreferrer' : undefined}
+    {...attributes}
+  >
     <slot />
   </a>
 ) : (
-  <button class:list={classes} type="button">
+  <button class:list={classes} type="button" {...attributes}>
     <slot />
   </button>
 )}

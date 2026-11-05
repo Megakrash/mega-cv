@@ -1,0 +1,192 @@
+---
+import { EDUCATION, EXPERIENCES, localize } from '../data/profile'
+import { UI, type Lang } from '../i18n/ui'
+
+import DateRange from './DateRange.astro'
+import TagList from './TagList.astro'
+
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+const t = UI[lang]
+---
+
+{EXPERIENCES.map((experience) => (
+  <article class="card experience">
+    <div class="experience__main">
+      <h3 class="experience__company">
+        <a href={experience.url} target="_blank" rel="noopener noreferrer">
+          {experience.company}
+        </a>
+      </h3>
+      <p class="experience__description">{experience.description[lang]}</p>
+
+      <ol class="timeline">
+        {experience.roles.map((role) => (
+          <li class:list={['timeline__item', { 'timeline__item--current': !('end' in role) }]}>
+            <p class="timeline__period">
+              <DateRange period={role} lang={lang} />
+            </p>
+            <h4 class="timeline__title">
+              {role.title[lang]}
+              <span class="timeline__contract">{` · ${role.contract[lang]}`}</span>
+            </h4>
+            <p class="timeline__summary">{role.summary[lang]}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+
+    <div class="experience__details">
+      <h4 class="experience__subtitle">{t.highlightsTitle}</h4>
+      <ul class="prompt-list">
+        {experience.highlights.map((highlight) => (
+          <li>{highlight[lang]}</li>
+        ))}
+      </ul>
+      <div class="experience__stack">
+        <TagList items={experience.stack.map((tag) => localize(tag, lang))} label={t.stackLabel} />
+      </div>
+    </div>
+  </article>
+))}
+
+<h3 class="comment-heading">{t.educationTitle}</h3>
+<ol class="education">
+  {EDUCATION.map((item) => (
+    <li class="card education__item">
+      <p class="education__date">
+        <DateRange period={item.date} lang={lang} />
+      </p>
+      <h4 class="education__title">{item.title[lang]}</h4>
+      {'school' in item && <p class="education__school">{item.school}</p>}
+      {'details' in item && <p class="education__details">{item.details[lang]}</p>}
+    </li>
+  ))}
+</ol>
+
+<style>
+  .experience {
+    display: grid;
+    gap: var(--space-6);
+  }
+  .experience__company {
+    margin: 0;
+    font-size: var(--text-xl);
+  }
+  .experience__company a {
+    text-decoration: none;
+  }
+  .experience__company a:hover {
+    color: var(--color-accent-text);
+    text-decoration: underline;
+  }
+  .experience__description {
+    margin: var(--space-1) 0 0;
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+  }
+
+  /* Vertical timeline: a rule with one dot per role, filled for the current one. */
+  .timeline {
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    border-left: 2px solid var(--color-border);
+    list-style: none;
+  }
+  .timeline__item {
+    position: relative;
+    padding: 0 0 var(--space-5) var(--space-5);
+  }
+  .timeline__item:last-child {
+    padding-bottom: 0;
+  }
+  .timeline__item::before {
+    content: '';
+    position: absolute;
+    top: 0.3rem;
+    left: calc(-0.4375rem - 1px);
+    width: 0.875rem;
+    height: 0.875rem;
+    border: 2px solid var(--color-accent);
+    border-radius: 50%;
+    background: var(--color-surface);
+  }
+  .timeline__item--current::before {
+    background: var(--color-accent);
+  }
+  .timeline__period {
+    margin: 0;
+    color: var(--color-accent-text);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+  }
+  .timeline__title {
+    margin: var(--space-1) 0 0;
+    font-size: var(--text-base);
+    line-height: 1.4;
+  }
+  .timeline__contract {
+    color: var(--color-muted);
+    font-weight: 400;
+  }
+  .timeline__summary {
+    margin: var(--space-2) 0 0;
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+  }
+
+  .experience__subtitle {
+    margin: 0 0 var(--space-4);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-muted);
+  }
+  .experience__stack {
+    margin-top: var(--space-5);
+  }
+
+  .education {
+    display: grid;
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .education__date {
+    margin: 0;
+    color: var(--color-accent-text);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+  }
+  .education__title {
+    margin: var(--space-2) 0 0;
+    font-size: var(--text-base);
+    line-height: 1.4;
+  }
+  .education__school {
+    margin: var(--space-1) 0 0;
+    font-size: var(--text-sm);
+  }
+  .education__details {
+    margin: var(--space-2) 0 0;
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+  }
+
+  @media (min-width: 48rem) {
+    .education {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .experience {
+      grid-template-columns: 22rem minmax(0, 1fr);
+      gap: var(--space-8);
+    }
+  }
+</style>

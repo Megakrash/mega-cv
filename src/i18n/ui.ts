@@ -39,6 +39,23 @@ interface UiStrings {
   ctaContact: string
   ctaExperience: string
   versionLabel: string
+  /** End of a period still going on: `sept. 2024 – aujourd’hui`. */
+  present: string
+  /** Command and comment of the hobbies terminal in the About section. */
+  hobbiesCommand: string
+  hobbiesComment: string
+  /** Accessible names of the tag lists. */
+  stackLabel: string
+  strengthsLabel: string
+  highlightsTitle: string
+  educationTitle: string
+  associationsTitle: string
+  inProduction: string
+  contactIntro: string
+  emailReveal: string
+  emailCopy: string
+  emailCopied: string
+  emailCopyFailed: string
 }
 
 export const UI = {
@@ -64,6 +81,21 @@ export const UI = {
     ctaContact: 'Me contacter',
     ctaExperience: 'Voir le parcours',
     versionLabel: 'Version du site',
+    present: 'aujourd’hui',
+    hobbiesCommand: 'ls ~/loisirs',
+    hobbiesComment: '# de l’automatisation, même pour jouer',
+    stackLabel: 'Technologies',
+    strengthsLabel: 'Atouts',
+    highlightsTitle: 'Réalisations',
+    educationTitle: 'Formation',
+    associationsTitle: 'Engagement associatif',
+    inProduction: 'En production',
+    contactIntro:
+      'Un poste, une mission ou simplement une question\u202f? Le plus simple est d’écrire un e-mail ou un message sur LinkedIn.',
+    emailReveal: 'Afficher l’adresse e-mail',
+    emailCopy: 'Copier',
+    emailCopied: 'Adresse copiée',
+    emailCopyFailed: 'Copie impossible\u00a0: l’adresse reste sélectionnable',
   },
   en: {
     metaTitle: 'Jonathan Scattolini · Full Stack Engineer',
@@ -87,6 +119,21 @@ export const UI = {
     ctaContact: 'Get in touch',
     ctaExperience: 'View experience',
     versionLabel: 'Site version',
+    present: 'present',
+    hobbiesCommand: 'ls ~/hobbies',
+    hobbiesComment: '# automation, even at play',
+    stackLabel: 'Technologies',
+    strengthsLabel: 'Strengths',
+    highlightsTitle: 'Highlights',
+    educationTitle: 'Education',
+    associationsTitle: 'Volunteering',
+    inProduction: 'In production',
+    contactIntro:
+      'A role, a project or just a question? Email or a LinkedIn message is the easiest way to reach me.',
+    emailReveal: 'Show email address',
+    emailCopy: 'Copy',
+    emailCopied: 'Address copied',
+    emailCopyFailed: 'Couldn’t copy: the address can still be selected',
   },
 } as const satisfies Record<Lang, UiStrings>
 

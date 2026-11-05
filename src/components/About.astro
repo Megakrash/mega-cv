@@ -1,0 +1,84 @@
+---
+import { ABOUT, HOBBIES } from '../data/profile'
+import { UI, type Lang } from '../i18n/ui'
+
+import TerminalWindow from './TerminalWindow.astro'
+
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+const t = UI[lang]
+---
+
+<div class="about">
+  <div class="about__text">
+    {ABOUT[lang].map((paragraph) => (
+      <p>{paragraph}</p>
+    ))}
+  </div>
+
+  <div class="about__terminal">
+    <TerminalWindow title="zsh">
+      <p class="shell__command">
+        <span class="shell__prompt" aria-hidden="true">
+          $
+        </span>
+        {t.hobbiesCommand}
+      </p>
+      <ul class="shell__output">
+        {HOBBIES.map((hobby) => (
+          <li>{hobby}</li>
+        ))}
+      </ul>
+      <p class="shell__comment">{t.hobbiesComment}</p>
+    </TerminalWindow>
+  </div>
+</div>
+
+<style>
+  .about {
+    display: grid;
+    gap: var(--space-7);
+  }
+  .about__text {
+    max-width: 42rem;
+  }
+  .about__text p {
+    margin: 0;
+  }
+  .about__text p + p {
+    margin-top: var(--space-4);
+  }
+
+  .shell__command,
+  .shell__comment {
+    margin: 0;
+  }
+  .shell__prompt {
+    /* Astro drops the whitespace between the prompt and the command. */
+    margin-right: 1ch;
+    color: var(--color-accent-text);
+  }
+  .shell__output {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 3ch;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--color-syntax-string);
+  }
+  .shell__comment {
+    color: var(--color-muted);
+  }
+
+  @media (min-width: 64rem) {
+    .about {
+      grid-template-columns: minmax(0, 1fr) 22rem;
+      align-items: start;
+      gap: var(--space-8);
+    }
+  }
+</style>
