@@ -1,0 +1,117 @@
+---
+import { LINKEDIN_URL } from '../data/profile'
+import { UI, type Lang } from '../i18n/ui'
+
+import Button from './Button.astro'
+import SocialIcon from './SocialIcon.astro'
+
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+const t = UI[lang]
+---
+
+<div class="contact" data-email data-copied={t.emailCopied} data-copy-failed={t.emailCopyFailed}>
+  <p class="contact__intro">{t.contactIntro}</p>
+
+  <div class="contact__actions">
+    {/* Shown by the script below: without JavaScript, LinkedIn stays the way in. */}
+    <Button data-email-reveal hidden>
+      {t.emailReveal}
+    </Button>
+    <div class="contact__email" data-email-revealed hidden>
+      <a class="contact__address" data-email-link></a>
+      <Button variant="ghost" data-email-copy>
+        {t.emailCopy}
+      </Button>
+    </div>
+    <Button href={LINKEDIN_URL} variant="ghost" external>
+      <SocialIcon name="linkedin" />
+      LinkedIn
+    </Button>
+  </div>
+
+  <p class="contact__status" role="status" data-email-status></p>
+</div>
+
+<script>
+  import { EMAIL_PARTS } from '../data/profile'
+
+  // The address is never in the HTML: it is assembled here, on click, then
+  // shown as a mailto: link next to a copy button.
+  const container = document.querySelector<HTMLElement>('[data-email]')
+  const reveal = container?.querySelector<HTMLButtonElement>('[data-email-reveal]')
+  const revealed = container?.querySelector<HTMLElement>('[data-email-revealed]')
+  const link = container?.querySelector<HTMLAnchorElement>('[data-email-link]')
+  const copy = container?.querySelector<HTMLButtonElement>('[data-email-copy]')
+  const status = container?.querySelector<HTMLElement>('[data-email-status]')
+
+  if (container && reveal && revealed && link && copy && status) {
+    const address = () => `${EMAIL_PARTS.user}@${EMAIL_PARTS.domain}`
+    let clearStatus: number | undefined
+
+    const announce = (message = '') => {
+      status.textContent = message
+      window.clearTimeout(clearStatus)
+      clearStatus = window.setTimeout(() => {
+        status.textContent = ''
+      }, 4000)
+    }
+
+    reveal.hidden = false
+
+    reveal.addEventListener('click', () => {
+      link.href = `mailto:${address()}`
+      link.textContent = address()
+      reveal.hidden = true
+      revealed.hidden = false
+      link.focus()
+    })
+
+    copy.addEventListener('click', () => {
+      navigator.clipboard.writeText(address()).then(
+        () => announce(container.dataset.copied),
+        () => announce(container.dataset.copyFailed)
+      )
+    })
+  }
+</script>
+
+<style>
+  .contact {
+    max-width: 42rem;
+  }
+  .contact__intro {
+    margin: 0;
+    font-size: var(--text-lg);
+  }
+  .contact__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+  .contact__email {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .contact__address {
+    color: var(--color-accent-text);
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+  .contact__status {
+    min-height: 1.6em;
+    margin: var(--space-3) 0 0;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+</style>

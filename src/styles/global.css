@@ -127,6 +127,11 @@ img {
   height: auto;
 }
 
+/* Components set their own display, which would otherwise beat `hidden`. */
+[hidden] {
+  display: none !important;
+}
+
 :focus-visible {
   outline: 2px solid var(--color-accent-text);
   outline-offset: 3px;
@@ -143,6 +148,49 @@ img {
   max-width: calc(var(--container) + 2 * var(--gutter));
   margin-inline: auto;
   padding-inline: var(--gutter);
+}
+
+/* A raised panel: skill, experience, education, position and project cards. */
+.card {
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+/* Subsection heading written as a code comment: `// Education`. */
+.comment-heading {
+  margin: var(--space-8) 0 var(--space-5);
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+.comment-heading::before {
+  /* The second value keeps screen readers from reading the slashes out. */
+  content: '// ';
+  content: '// ' / '';
+  color: var(--color-accent-text);
+}
+
+/* A list with terminal prompt bullets. */
+.prompt-list {
+  margin: 0;
+  padding: 0 0 0 2.5ch;
+  list-style: none;
+}
+.prompt-list li {
+  position: relative;
+}
+.prompt-list li + li {
+  margin-top: var(--space-3);
+}
+.prompt-list li::before {
+  content: '>';
+  content: '>' / '';
+  position: absolute;
+  left: -2.5ch;
+  color: var(--color-accent-text);
+  font-family: var(--font-mono);
 }
 
 /* Motion: everything animated opts in here, so reduced motion means none. */

@@ -1,0 +1,31 @@
+---
+import Tag from './Tag.astro'
+
+/** A wrapping row of technology chips. */
+interface Props {
+  items: readonly string[]
+  /** Accessible name of the list, when the context does not give one. */
+  label?: string
+}
+
+const { items, label } = Astro.props
+---
+
+<ul class="tags" aria-label={label}>
+  {items.map((item) => (
+    <li>
+      <Tag>{item}</Tag>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

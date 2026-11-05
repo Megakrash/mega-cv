@@ -1,0 +1,50 @@
+---
+import { SKILLS, localize } from '../data/profile'
+import type { Lang } from '../i18n/ui'
+
+import TagList from './TagList.astro'
+
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+const groups = SKILLS.map((group) => ({
+  title: group.title[lang],
+  items: group.items.map((item) => localize(item, lang)),
+}))
+---
+
+<ul class="skills">
+  {groups.map((group) => (
+    <li class="card skills__group">
+      <h3 class="skills__title">
+        <span class="skills__path" aria-hidden="true">
+          ~/
+        </span>
+        {group.title}
+      </h3>
+      <TagList items={group.items} />
+    </li>
+  ))}
+</ul>
+
+<style>
+  .skills {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .skills__title {
+    margin: 0 0 var(--space-4);
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    font-weight: 600;
+  }
+  .skills__path {
+    color: var(--color-accent-text);
+  }
+</style>

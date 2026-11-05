@@ -1,0 +1,41 @@
+---
+/**
+ * A date or a period in <time> elements: `sept. 2024`, `2007 – 2012`,
+ * `sept. 2024 – aujourd’hui`.
+ */
+import type { DateString, Period } from '../data/profile'
+import { UI, type Lang } from '../i18n/ui'
+
+interface Props {
+  period: DateString | Period
+  lang: Lang
+}
+
+const { period, lang } = Astro.props
+const start = typeof period === 'string' ? period : period.start
+const range = typeof period === 'string' ? undefined : period
+
+const monthYear = new Intl.DateTimeFormat(lang, {
+  month: 'short',
+  year: 'numeric',
+  timeZone: 'UTC',
+})
+
+/** "YYYY-MM" becomes a short month and year, "YYYY" stays the year. */
+function format(date: DateString): string {
+  const [year, month] = date.split('-')
+  if (!month) return date
+  return monthYear.format(new Date(Date.UTC(Number(year), Number(month) - 1)))
+}
+
+// No-break space before the dash: a line never starts with it.
+const SEPARATOR = '\u00a0– '
+---
+
+<time datetime={start}>{format(start)}</time>
+{range && (
+  <>
+    {SEPARATOR}
+    {range.end ? <time datetime={range.end}>{format(range.end)}</time> : UI[lang].present}
+  </>
+)}

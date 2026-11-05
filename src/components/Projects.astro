@@ -1,0 +1,98 @@
+---
+import { PROJECTS } from '../data/profile'
+import { UI, type Lang } from '../i18n/ui'
+
+import Button from './Button.astro'
+import TagList from './TagList.astro'
+
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+const t = UI[lang]
+---
+
+<ul class="projects">
+  {PROJECTS.map((project) => (
+    <li class="card project">
+      <div class="project__header">
+        <h3 class="project__name">{project.name}</h3>
+        <p class="project__status">
+          <span class="project__dot" aria-hidden="true" />
+          {t.inProduction}
+        </p>
+      </div>
+      <p class="project__description">{project.description[lang]}</p>
+      <ul class="prompt-list project__highlights">
+        {project.highlights.map((highlight) => (
+          <li>{highlight[lang]}</li>
+        ))}
+      </ul>
+      <TagList items={project.stack} label={t.stackLabel} />
+      <div class="project__link">
+        <Button href={project.url} variant="ghost" external>
+          {new URL(project.url).hostname}
+          <span aria-hidden="true">↗</span>
+        </Button>
+      </div>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .projects {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 32rem), 1fr));
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .project {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  .project__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+  .project__name {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-xl);
+  }
+  .project__status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+  }
+  .project__dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+  .project__description {
+    margin: 0;
+  }
+  .project__highlights {
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
+  .project__link {
+    margin-top: auto;
+    padding-top: var(--space-2);
+  }
+</style>
