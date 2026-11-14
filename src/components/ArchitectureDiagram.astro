@@ -1,0 +1,208 @@
+---
+import { ARCHITECTURE } from '../data/mega-series'
+import { localize, type Text } from '../data/profile'
+import type { Lang } from '../i18n/ui'
+
+/**
+ * The production architecture of mega-series, drawn with lists and CSS: no
+ * image to keep in sync, readable as nested lists, themed by the tokens.
+ */
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+const l = (text: Text) => localize(text, lang)
+const { clients, server, outside, flows } = ARCHITECTURE
+---
+
+<figure class="arch">
+  <div class="arch__diagram">
+    <div class="arch__group">
+      <p class="arch__label">{l(clients.label)}</p>
+      <ul class="arch__row">
+        {clients.nodes.map((node) => (
+          <li class="arch__node">
+            <span class="arch__name">{l(node.name)}</span>
+            <span class="arch__detail">{l(node.detail)}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <p class="arch__link">{ARCHITECTURE.transport}</p>
+
+    <div class="arch__group arch__group--server">
+      <p class="arch__label">{server.label}</p>
+      <ol class="arch__layers">
+        {server.layers.map((layer) => (
+          <li>
+            <ul class="arch__row">
+              {layer.map((node) => (
+                <li class="arch__node">
+                  <span class="arch__name">{l(node.name)}</span>
+                  <span class="arch__detail">{l(node.detail)}</span>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ol>
+    </div>
+
+    <p class="arch__link">{l(ARCHITECTURE.outbound)}</p>
+
+    <ul class="arch__row">
+      {outside.map((node) => (
+        <li class="arch__node">
+          <span class="arch__name">{l(node.name)}</span>
+          <span class="arch__detail">{l(node.detail)}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="arch__flows">
+    {flows.map((flow) => (
+      <div class="flow">
+        <p class="arch__label">{l(flow.title)}</p>
+        <ol class="flow__steps">
+          {flow.steps.map((step) => (
+            <li class="flow__step">{l(step)}</li>
+          ))}
+        </ol>
+      </div>
+    ))}
+  </div>
+
+  <figcaption class="arch__caption">{l(ARCHITECTURE.caption)}</figcaption>
+</figure>
+
+<style>
+  .arch {
+    display: grid;
+    gap: var(--space-4);
+    margin: var(--space-6) 0;
+  }
+
+  .arch__diagram {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-5) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+  .arch__group,
+  .arch__diagram > .arch__row {
+    width: 100%;
+    text-align: center;
+  }
+  .arch__group--server {
+    max-width: 40rem;
+    padding: var(--space-4);
+    border: 1px dashed color-mix(in srgb, var(--color-accent) 60%, transparent);
+    border-radius: var(--radius-lg);
+  }
+  .arch__label {
+    margin: 0 0 var(--space-3);
+    color: var(--color-accent-text);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .arch__row,
+  .arch__layers {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .arch__row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-3);
+  }
+  .arch__node {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: min(100%, 12rem);
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-2);
+    text-align: center;
+  }
+  .arch__name {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+  .arch__detail {
+    color: var(--color-muted);
+    font-size: var(--text-xs);
+  }
+
+  /* Connectors: a short vertical line between two layers, and around the
+     labelled links. */
+  .arch__layers > li + li::before,
+  .arch__link::before,
+  .arch__link::after {
+    content: '';
+    display: block;
+    width: 1px;
+    height: var(--space-4);
+    margin-inline: auto;
+    background: color-mix(in srgb, var(--color-accent) 60%, transparent);
+  }
+  .arch__link {
+    margin: 0;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    text-align: center;
+  }
+
+  .arch__flows {
+    display: grid;
+    gap: var(--space-4);
+  }
+  .flow {
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+  .flow__steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-3);
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    list-style: none;
+  }
+  .flow__step + .flow__step::before {
+    content: '→';
+    content: '→' / '';
+    margin-right: var(--space-3);
+    color: var(--color-accent-text);
+  }
+
+  .arch__caption {
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+    text-align: center;
+  }
+
+  @media (min-width: 48rem) {
+    .arch__flows {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

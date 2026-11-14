@@ -1,0 +1,15 @@
+---
+import MegaSeriesPage from '../../../components/MegaSeriesPage.astro'
+import { MEGA_SERIES } from '../../../data/mega-series'
+import { MEGA_SERIES_PATHS } from '../../../i18n/ui'
+import BaseLayout from '../../../layouts/BaseLayout.astro'
+---
+
+<BaseLayout
+  lang="en"
+  paths={MEGA_SERIES_PATHS}
+  title={MEGA_SERIES.metaTitle}
+  description={MEGA_SERIES.metaDescription.en}
+>
+  <MegaSeriesPage lang="en" />
+</BaseLayout>
