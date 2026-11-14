@@ -456,7 +456,7 @@ export const PAST_CAREER = {
       organization: 'Radio JET FM',
       start: '1995',
       end: '2000',
-      role: { fr: 'Bénévole', en: 'Volunteer' },
+      role: { fr: 'Animateur et technicien bénévole', en: 'Volunteer host and technician' },
     },
   ],
 } as const satisfies {
