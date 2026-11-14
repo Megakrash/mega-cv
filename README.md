@@ -40,13 +40,15 @@ CI (`.github/workflows/test.yml`) runs lint, format, check and build on every pu
 
 ```
 src/
-  pages/            index.astro (FR, /) and en/index.astro (EN, /en/)
+  pages/            index.astro (FR, /) and en/index.astro (EN, /en/), then the mega-series
+                    page: projets/mega-series.astro and en/projects/mega-series.astro
   layouts/          page shell (<head>, hreflang links, header, footer)
-  components/       header, footer, hero, sections and base components
+  components/       header, footer, hero, sections, project page and base components
   data/profile.ts   profile content of both languages (shared with the CV)
-  i18n/ui.ts        UI strings of both languages, home page sections
+  data/mega-series.ts  content of the mega-series page (both languages)
+  i18n/ui.ts        UI strings of both languages, page paths, home page sections
   lib/version.ts    site version shown in the footer
-  assets/           images optimized at build time (photo)
+  assets/           images optimized at build time (photo, mega-series screenshots)
   styles/           design tokens and global CSS
 public/             files copied as is (favicon, theme-init.js)
 docker/             nginx config and security headers of the production image

@@ -3,6 +3,9 @@ export const LANGS = ['fr', 'en'] as const
 
 export type Lang = (typeof LANGS)[number]
 
+/** Path of one page in each locale: the language switch and hreflang links. */
+export type PagePaths = Readonly<Record<Lang, string>>
+
 /**
  * Home page path of each locale (French is the default, unprefixed). Keep the
  * locales in sync with the `i18n` block of astro.config.mjs.
@@ -10,7 +13,13 @@ export type Lang = (typeof LANGS)[number]
 export const HOME_PATHS = {
   fr: '/',
   en: '/en/',
-} as const satisfies Record<Lang, string>
+} as const satisfies PagePaths
+
+/** The mega-series project page (src/pages/projets/ and src/pages/en/projects/). */
+export const MEGA_SERIES_PATHS = {
+  fr: '/projets/mega-series/',
+  en: '/en/projects/mega-series/',
+} as const satisfies PagePaths
 
 /** Sections of the home page, in page order (this order numbers them). */
 export const SECTION_KEYS = [
@@ -51,6 +60,9 @@ interface UiStrings {
   educationTitle: string
   associationsTitle: string
   inProduction: string
+  /** Link from a project card to the project page, and back. */
+  projectDetails: string
+  backToProjects: string
   contactIntro: string
   emailReveal: string
   emailCopy: string
@@ -90,6 +102,8 @@ export const UI = {
     educationTitle: 'Formation',
     associationsTitle: 'Engagement associatif',
     inProduction: 'En production',
+    projectDetails: 'Voir le projet en détail',
+    backToProjects: 'Retour aux projets',
     contactIntro:
       'Un poste, une mission ou simplement une question\u202f? Le plus simple est d’écrire un e-mail ou un message sur LinkedIn.',
     emailReveal: 'Afficher l’adresse e-mail',
@@ -128,6 +142,8 @@ export const UI = {
     educationTitle: 'Education',
     associationsTitle: 'Volunteering',
     inProduction: 'In production',
+    projectDetails: 'View project details',
+    backToProjects: 'Back to projects',
     contactIntro:
       'A role, a project or just a question? Email or a LinkedIn message is the easiest way to reach me.',
     emailReveal: 'Show email address',

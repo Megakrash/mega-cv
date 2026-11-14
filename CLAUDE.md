@@ -21,11 +21,14 @@ simplest solution that works; avoid abstractions the site does not need yet.
 ## i18n
 
 French is the default locale at `/`, English lives under `/en/`. Every page exists in both
-languages. UI strings (including the home page sections, their anchors and order) live in
-`src/i18n/ui.ts`; the profile content shared by the site and the CV lives in
-`src/data/profile.ts`. Both are typed for both locales. The lists of `profile.ts` (experiences,
-skills, education…) carry both languages in each item (`Localized`), so dates and technologies are
-written once; dates are ISO strings (`YYYY-MM` or `YYYY`) formatted by `DateRange.astro`.
+languages, with localized paths (`/projets/mega-series/` and `/en/projects/mega-series/`): each
+page's paths are declared in `src/i18n/ui.ts` (`PagePaths`) and passed to `BaseLayout`, which
+uses them for the language switch and the hreflang links. UI strings (including the home page
+sections, their anchors and order) live in `src/i18n/ui.ts`; the profile content shared by the
+site and the CV lives in `src/data/profile.ts`, and the mega-series page content in
+`src/data/mega-series.ts`. All are typed for both locales. Their lists (experiences, skills,
+education…) carry both languages in each item (`Localized`), so dates and technologies are written
+once; dates are ISO strings (`YYYY-MM` or `YYYY`) formatted by `DateRange.astro`.
 
 ## Conventions
 
@@ -42,6 +45,10 @@ written once; dates are ISO strings (`YYYY-MM` or `YYYY`) formatted by `DateRang
   on click. No phone number anywhere, neither on the site nor on the CV.
 - The repository is public: never commit personal data. Personal source documents dropped at the
   repo root (photo, old CV) are gitignored; only web-optimized derivatives get committed.
+- mega-series content never helps an attacker: no IP, identifier, provider or bucket name,
+  threshold or known weakness of its production setup. Its screenshots (`src/assets/mega-series/`,
+  WebP sources that Astro converts at build time) are taken on mega-series.fr with a demo account
+  that has no friends, so that no other user's data shows.
 - The CSP is enforced (`docker/security-headers.conf`): no inline `<script>`, `<style>` or `style`
   attribute, no third-party origin. Keep `build.inlineStylesheets: 'never'` and
   `vite.build.assetsInlineLimit: 0` in the Astro config (otherwise Astro inlines small component

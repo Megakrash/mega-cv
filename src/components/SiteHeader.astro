@@ -1,13 +1,23 @@
 ---
-import { HOME_PATHS, LANGS, SECTION_KEYS, UI, sectionHref, type Lang } from '../i18n/ui'
+import {
+  HOME_PATHS,
+  LANGS,
+  SECTION_KEYS,
+  UI,
+  sectionHref,
+  type Lang,
+  type PagePaths,
+} from '../i18n/ui'
 
 import ThemeToggle from './ThemeToggle.astro'
 
 interface Props {
   lang: Lang
+  /** The current page in every language, for the language switch. */
+  paths: PagePaths
 }
 
-const { lang } = Astro.props
+const { lang, paths } = Astro.props
 const t = UI[lang]
 const links = SECTION_KEYS.map((key) => ({
   href: sectionHref(lang, key),
@@ -48,7 +58,7 @@ const links = SECTION_KEYS.map((key) => ({
           ) : (
             <a
               class="lang__link"
-              href={HOME_PATHS[code]}
+              href={paths[code]}
               hreflang={code}
               lang={code}
               aria-label={t.switchLanguage}

@@ -1,4 +1,4 @@
-import type { Lang } from '../i18n/ui'
+import { MEGA_SERIES_PATHS, type Lang, type PagePaths } from '../i18n/ui'
 
 export const LINKEDIN_URL = 'https://www.linkedin.com/in/jonathanscattolini/'
 export const GITHUB_URL = 'https://github.com/Megakrash'
@@ -61,12 +61,15 @@ export const PROFILE = {
 /** A text in both site languages. */
 export type Localized<T = string> = Readonly<Record<Lang, T>>
 
-/** A tag: technology names stay as they are, generic terms are translated. */
-type Tag = string | Localized
+/**
+ * A text that may not need translating: technology names stay as they are,
+ * generic terms are translated.
+ */
+export type Text = string | Localized
 
-/** Text of a tag in the given language. */
-export function localize(tag: Tag, lang: Lang): string {
-  return typeof tag === 'string' ? tag : tag[lang]
+/** A text in the given language. */
+export function localize(text: Text, lang: Lang): string {
+  return typeof text === 'string' ? text : text[lang]
 }
 
 /** "YYYY-MM", or "YYYY" when the month does not matter. */
@@ -93,7 +96,7 @@ interface Experience {
   /** Positions held in the company, newest first. */
   roles: readonly Role[]
   highlights: readonly Localized[]
-  stack: readonly Tag[]
+  stack: readonly Text[]
 }
 
 interface Education {
@@ -106,7 +109,7 @@ interface Education {
 
 interface SkillGroup {
   title: Localized
-  items: readonly Tag[]
+  items: readonly Text[]
 }
 
 interface PastPosition extends Period {
@@ -120,6 +123,8 @@ interface PastPosition extends Period {
 interface Project {
   name: string
   url: string
+  /** Page presenting the project on this site. */
+  page?: PagePaths
   description: Localized
   highlights: readonly Localized[]
   stack: readonly string[]
@@ -456,7 +461,7 @@ export const PAST_CAREER = {
       organization: 'Radio JET FM',
       start: '1995',
       end: '2000',
-      role: { fr: 'Bénévole', en: 'Volunteer' },
+      role: { fr: 'Animateur et technicien bénévole', en: 'Volunteer host and technician' },
     },
   ],
 } as const satisfies {
@@ -470,6 +475,7 @@ export const PROJECTS = [
   {
     name: 'mega-series',
     url: 'https://mega-series.fr',
+    page: MEGA_SERIES_PATHS,
     description: {
       fr: 'Suivi de séries multi-utilisateur\u00a0: catalogue TMDB, collection, watchlist et suivi épisode par épisode. Conçu et développé seul en pilotant des agents IA, de la base de données à la mise en production.',
       en: 'Multi-user TV series tracker: TMDB catalog, collection, watchlist and episode-by-episode tracking. Designed and built solo by driving AI agents, from the database to production.',
