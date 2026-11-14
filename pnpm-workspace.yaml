@@ -7,3 +7,14 @@
 # the pnpm version is still enforced by corepack (local + Docker) and
 # pnpm/action-setup (CI), which both read `packageManager` from package.json.
 pmOnFail: ignore
+
+# Overrides are kept only while a parent's range caps a dependency below its
+# security fix; drop each one as soon as `npm view <parent> dependencies.<dep>`
+# accepts the fix (temporary overrides are removed once the lockfile moved).
+overrides:
+  # minimatch < 11.0.1: denial of service through glob patterns (dev only,
+  # through ESLint). @typescript-eslint/typescript-estree 8.72 still asks
+  # ^10.2.2, as do eslint 10.14 and @eslint/config-array 0.23.5 (their next
+  # releases ask ^11). The minimatch() and Minimatch APIs they call are
+  # unchanged in 11.
+  'minimatch@<11.0.1': ^11.0.1
