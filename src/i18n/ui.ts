@@ -45,7 +45,10 @@ interface UiStrings {
   navLabel: string
   menuLabel: string
   themeToggleLabel: string
+  /** Read after the code of the other language (`EN`) in the language switch. */
   switchLanguage: string
+  /** Description of the links that open in a new tab. */
+  newTab: string
   photoAlt: string
   ctaContact: string
   ctaExperience: string
@@ -114,6 +117,7 @@ export const UI = {
     menuLabel: 'Menu',
     themeToggleLabel: 'Basculer entre thème clair et thème sombre',
     switchLanguage: 'Read in English',
+    newTab: 'S’ouvre dans un nouvel onglet',
     photoAlt: 'Portrait de Jonathan Scattolini',
     ctaContact: 'Me contacter',
     ctaExperience: 'Voir le parcours',
@@ -173,6 +177,7 @@ export const UI = {
     menuLabel: 'Menu',
     themeToggleLabel: 'Switch between light and dark theme',
     switchLanguage: 'Lire en français',
+    newTab: 'Opens in a new tab',
     photoAlt: 'Portrait of Jonathan Scattolini',
     ctaContact: 'Get in touch',
     ctaExperience: 'View experience',
@@ -213,6 +218,12 @@ export const UI = {
     },
   },
 } as const satisfies Record<Lang, UiStrings>
+
+/**
+ * Id of the hidden "opens in a new tab" text (BaseLayout) that links to other
+ * sites point to with aria-describedby.
+ */
+export const NEW_TAB_HINT_ID = 'new-tab-hint'
 
 /**
  * Link to a home page section. It carries the page path so that it also works

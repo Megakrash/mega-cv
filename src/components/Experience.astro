@@ -1,6 +1,6 @@
 ---
 import { EDUCATION, EXPERIENCES, localize } from '../data/profile'
-import { UI, type Lang } from '../i18n/ui'
+import { NEW_TAB_HINT_ID, UI, type Lang } from '../i18n/ui'
 
 import DateRange from './DateRange.astro'
 import TagList from './TagList.astro'
@@ -17,7 +17,12 @@ const t = UI[lang]
   <article class="card experience">
     <div class="experience__main">
       <h3 class="experience__company">
-        <a href={experience.url} target="_blank" rel="noopener noreferrer">
+        <a
+          href={experience.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-describedby={NEW_TAB_HINT_ID}
+        >
           {experience.company}
         </a>
       </h3>

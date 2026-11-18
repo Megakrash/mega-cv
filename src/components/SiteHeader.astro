@@ -68,7 +68,7 @@ const links = SECTION_KEYS.map((key) => ({
               href={paths[code]}
               hreflang={code}
               lang={code}
-              aria-label={t.switchLanguage}
+              aria-label={`${code.toUpperCase()}, ${t.switchLanguage}`}
             >
               {code.toUpperCase()}
             </a>

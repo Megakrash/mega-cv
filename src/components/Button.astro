@@ -1,9 +1,11 @@
 ---
+import { NEW_TAB_HINT_ID } from '../i18n/ui'
+
 /** A call-to-action: a link when `href` is given, a plain button otherwise. */
 interface Props {
   href?: string
   variant?: 'primary' | 'ghost'
-  /** Link to another site: opens in a new tab. */
+  /** Link to another site: opens in a new tab, which assistive tech is told. */
   external?: boolean
   /** Link to a file to save rather than open (the CV). */
   download?: boolean
@@ -22,6 +24,7 @@ const classes = ['button', `button--${variant}`]
     href={href}
     target={external ? '_blank' : undefined}
     rel={external ? 'noopener noreferrer' : undefined}
+    aria-describedby={external ? NEW_TAB_HINT_ID : undefined}
     download={download ? '' : undefined}
     {...attributes}
   >
