@@ -3,7 +3,7 @@ import { GITHUB_URL, LINKEDIN_URL } from '../data/profile'
 import { UI, type Lang } from '../i18n/ui'
 import { APP_VERSION, RELEASE_URL } from '../lib/version'
 
-import SocialIcon from './SocialIcon.astro'
+import Icon from './Icon.astro'
 
 interface Props {
   lang: Lang
@@ -17,13 +17,13 @@ const { lang } = Astro.props
     <ul class="footer__links">
       <li>
         <a class="footer__link" href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">
-          <SocialIcon name="linkedin" />
+          <Icon name="linkedin" />
           LinkedIn
         </a>
       </li>
       <li>
         <a class="footer__link" href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
-          <SocialIcon name="github" />
+          <Icon name="github" />
           GitHub
         </a>
       </li>
