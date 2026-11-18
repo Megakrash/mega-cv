@@ -339,7 +339,8 @@ function lowerFirst(text: string): string {
     font-size: 19pt;
     font-weight: 700;
     line-height: 1.1;
-    letter-spacing: -0.02em;
+    /* No negative letter-spacing: it narrows the space between the first and
+       last names until text extraction reads them as one word. */
   }
   .headline {
     margin-top: 0.8mm;
@@ -426,17 +427,21 @@ function lowerFirst(text: string): string {
     margin-top: 1mm;
   }
 
+  /* The marker stays in the text flow (hanging indent), never positioned:
+     Chrome writes positioned elements after the rest of the page in the PDF,
+     so text extraction would read every bullet at the very end. */
   .bullets li {
-    position: relative;
     padding-left: 3mm;
+    text-indent: -3mm;
   }
   .bullets li + li {
     margin-top: 0.4mm;
   }
   .bullets li::before {
     content: '›';
-    position: absolute;
-    left: 0;
+    display: inline-block;
+    width: 3mm;
+    text-indent: 0;
     color: var(--accent-text);
     font-weight: 700;
   }
