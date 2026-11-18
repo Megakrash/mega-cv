@@ -116,10 +116,15 @@ const screenshots = await Promise.all(
     <span aria-hidden="true">←</span>
     {t.backToProjects}
   </a>
-  <Button href={project.url} variant="ghost" external>
-    {hostname}
-    <span aria-hidden="true">↗</span>
-  </Button>
+  <div class="outro__actions">
+    <Button href={sectionHref(lang, 'contact')} variant="ghost">
+      {MEGA_SERIES.demoRequest[lang]}
+    </Button>
+    <Button href={project.url} variant="ghost" external>
+      {hostname}
+      <span aria-hidden="true">↗</span>
+    </Button>
+  </div>
 </div>
 
 <style>
@@ -272,6 +277,11 @@ const screenshots = await Promise.all(
     justify-content: space-between;
     gap: var(--space-4);
     padding-bottom: var(--space-9);
+  }
+  .outro__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
   }
 
   @media (min-width: 48rem) {
