@@ -70,6 +70,15 @@ interface UiStrings {
   emailCopy: string
   emailCopied: string
   emailCopyFailed: string
+  /** The 404 page: its terminal shows a failed `cd`. */
+  notFound: {
+    title: string
+    text: string
+    command: string
+    error: string
+    home: string
+    project: string
+  }
   /** Download buttons of the CV (PDF) and section titles of the printed CV. */
   cv: {
     download: string
@@ -126,6 +135,14 @@ export const UI = {
     emailCopy: 'Copier',
     emailCopied: 'Adresse copiée',
     emailCopyFailed: 'Copie impossible\u00a0: l’adresse reste sélectionnable',
+    notFound: {
+      title: 'Page introuvable',
+      text: 'Cette page n’existe pas, ou n’existe plus.',
+      command: 'cd ~/cette-page',
+      error: 'cd: aucun fichier ou dossier de ce type: ~/cette-page',
+      home: 'Retour à l’accueil',
+      project: 'Voir le projet mega-series',
+    },
     cv: {
       download: 'Télécharger le CV',
       downloadLabel: 'Télécharger le CV (PDF)',
@@ -177,6 +194,14 @@ export const UI = {
     emailCopy: 'Copy',
     emailCopied: 'Address copied',
     emailCopyFailed: 'Couldn’t copy: the address can still be selected',
+    notFound: {
+      title: 'Page not found',
+      text: 'This page doesn’t exist, or no longer does.',
+      command: 'cd ~/this-page',
+      error: 'cd: no such file or directory: ~/this-page',
+      home: 'Back to home',
+      project: 'See the mega-series project',
+    },
     cv: {
       download: 'Download CV',
       downloadLabel: 'Download CV (PDF)',
