@@ -98,7 +98,7 @@ function lowerFirst(text: string): string {
           ))}
         </ul>
         <p class="status">
-          {profile.location} · {profile.status} · {profile.lookingFor}
+          {profile.location} · {profile.workMode}
         </p>
       </div>
       {
@@ -153,7 +153,7 @@ function lowerFirst(text: string): string {
     <section class="section">
       <h2 class="section__title">{t.cv.project}</h2>
       {PROJECTS.map((project) => {
-        const page = project.page && new URL(project.page[lang], site).href
+        const page = 'page' in project && new URL(project.page[lang], site).href
         return (
           <article>
             <h3 class="entry">
@@ -172,18 +172,22 @@ function lowerFirst(text: string): string {
               <span class="date">{t.inProduction}</span>
             </h3>
             <p>{project.description[lang]}</p>
-            <ul class="bullets">
-              {project.highlights.map((highlight) => (
-                <li>{highlight[lang]}</li>
-              ))}
-            </ul>
-            <p class="muted">
-              <span class="label">
-                {t.stackLabel}
-                {colon}
-              </span>
-              {project.stack.join(', ')}
-            </p>
+            {!('brief' in project) && (
+              <>
+                <ul class="bullets">
+                  {project.highlights.map((highlight) => (
+                    <li>{highlight[lang]}</li>
+                  ))}
+                </ul>
+                <p class="muted">
+                  <span class="label">
+                    {t.stackLabel}
+                    {colon}
+                  </span>
+                  {project.stack.join(', ')}
+                </p>
+              </>
+            )}
           </article>
         )
       })}
@@ -209,15 +213,14 @@ function lowerFirst(text: string): string {
       <ul class="rows">
         {EDUCATION.map((item) => (
           <li>
-            <p>
-              <strong>{item.title[lang]}</strong>
-              {'school' in item && ` · ${item.school}`}
-              {' · '}
-              <span class="date">
-                <DateRange period={item.date} lang={lang} />
-              </span>
-            </p>
-            {'details' in item && <p class="muted">{item.details[lang]}</p>}
+            <strong>{item.title[lang]}</strong>
+            {'school' in item && ` · ${item.school}`}
+            {' · '}
+            <span class="date">
+              <DateRange period={item.date} lang={lang} />
+            </span>
+            {/* On the same line as the degree: room for the experience above. */}
+            {'details' in item && <span class="muted">{` · ${item.details[lang]}`}</span>}
           </li>
         ))}
       </ul>
@@ -408,6 +411,9 @@ function lowerFirst(text: string): string {
 
   .entry {
     font-size: 9pt;
+  }
+  article + article {
+    margin-top: 1.2mm;
   }
 
   /* Dates follow their item on the same line, never in a right-hand column:

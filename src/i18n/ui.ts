@@ -21,13 +21,16 @@ export const MEGA_SERIES_PATHS = {
   en: '/en/projects/mega-series/',
 } as const satisfies PagePaths
 
-/** Sections of the home page, in page order (this order numbers them). */
+/**
+ * Sections of the home page, in page order (this order numbers them): the
+ * proof (experience, projects) before the list of skills.
+ */
 export const SECTION_KEYS = [
   'about',
-  'skills',
   'experience',
-  'beforeCode',
   'projects',
+  'skills',
+  'beforeCode',
   'contact',
 ] as const
 
@@ -51,7 +54,8 @@ interface UiStrings {
   newTab: string
   photoAlt: string
   ctaContact: string
-  ctaExperience: string
+  /** Hero link to the mega-series page. */
+  ctaProject: string
   versionLabel: string
   /** End of a period still going on: `sept. 2024 – aujourd’hui`. */
   present: string
@@ -100,9 +104,9 @@ export const UI = {
   fr: {
     metaTitle: 'Jonathan Scattolini · Ingénieur Full Stack',
     metaDescription:
-      'Jonathan Scattolini, ingénieur full stack\u00a0: CI/CD, qualité et automatisation pilotées par l’IA.',
+      'Jonathan Scattolini, ingénieur full stack\u00a0: développement agentique, CI/CD et qualité logicielle.',
     previewAlt:
-      'Jonathan Scattolini, ingénieur full stack\u00a0: CI/CD, qualité et automatisation pilotées par l’IA. Ouvert aux opportunités.',
+      'Jonathan Scattolini, ingénieur full stack\u00a0: développement agentique, CI/CD et qualité logicielle. Nantes, full remote ou hybride.',
     skipToContent: 'Aller au contenu',
     sections: {
       about: { id: 'a-propos', label: 'À propos' },
@@ -120,7 +124,7 @@ export const UI = {
     newTab: 'S’ouvre dans un nouvel onglet',
     photoAlt: 'Portrait de Jonathan Scattolini',
     ctaContact: 'Me contacter',
-    ctaExperience: 'Voir le parcours',
+    ctaProject: 'Voir mega-series',
     versionLabel: 'Version du site',
     present: 'aujourd’hui',
     hobbiesCommand: 'ls ~/loisirs',
@@ -134,7 +138,7 @@ export const UI = {
     projectDetails: 'Voir le projet en détail',
     backToProjects: 'Retour aux projets',
     contactIntro:
-      'Un poste, une mission ou simplement une question\u202f? Le plus simple est d’écrire un e-mail ou un message sur LinkedIn.',
+      'Un poste, un projet ou simplement une question\u202f? Le plus simple est d’écrire un e-mail ou un message sur LinkedIn.',
     emailReveal: 'Afficher l’adresse e-mail',
     emailCopy: 'Copier',
     emailCopied: 'Adresse copiée',
@@ -151,7 +155,7 @@ export const UI = {
       download: 'Télécharger le CV',
       downloadLabel: 'Télécharger le CV (PDF)',
       experience: 'Expérience professionnelle',
-      project: 'Projet personnel',
+      project: 'Projets personnels',
       beforeCode: 'Expérience avant le code',
       hobbies: 'Loisirs',
       hobbiesIntro: 'Jeux de logique et d’automatisation',
@@ -160,9 +164,9 @@ export const UI = {
   en: {
     metaTitle: 'Jonathan Scattolini · Full Stack Engineer',
     metaDescription:
-      'Jonathan Scattolini, full stack engineer: CI/CD, quality & AI-driven automation.',
+      'Jonathan Scattolini, full stack engineer: agentic development, CI/CD and software quality.',
     previewAlt:
-      'Jonathan Scattolini, full stack engineer: CI/CD, quality & AI-driven automation. Open to opportunities.',
+      'Jonathan Scattolini, full stack engineer: agentic development, CI/CD and software quality. Nantes, full remote or hybrid.',
     skipToContent: 'Skip to content',
     sections: {
       about: { id: 'about', label: 'About' },
@@ -180,7 +184,7 @@ export const UI = {
     newTab: 'Opens in a new tab',
     photoAlt: 'Portrait of Jonathan Scattolini',
     ctaContact: 'Get in touch',
-    ctaExperience: 'View experience',
+    ctaProject: 'See mega-series',
     versionLabel: 'Site version',
     present: 'present',
     hobbiesCommand: 'ls ~/hobbies',
@@ -211,7 +215,7 @@ export const UI = {
       download: 'Download CV',
       downloadLabel: 'Download CV (PDF)',
       experience: 'Professional experience',
-      project: 'Personal project',
+      project: 'Personal projects',
       beforeCode: 'Experience before code',
       hobbies: 'Hobbies',
       hobbiesIntro: 'Logic and automation games',

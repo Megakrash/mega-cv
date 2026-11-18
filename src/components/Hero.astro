@@ -3,7 +3,7 @@ import { Picture } from 'astro:assets'
 
 import photo from '../assets/photo.jpg'
 import { PROFILE } from '../data/profile'
-import { UI, sectionHref, type Lang } from '../i18n/ui'
+import { MEGA_SERIES_PATHS, UI, sectionHref, type Lang } from '../i18n/ui'
 import { CV_PDF_PATHS } from '../lib/cv'
 
 import Button from './Button.astro'
@@ -23,9 +23,9 @@ const t = UI[lang]
 const whoami: Record<string, string | readonly string[]> = {
   name: profile.name,
   role: profile.jobTitle,
-  location: profile.location,
+  background: profile.background,
   focus: profile.focus,
-  status: profile.status,
+  location: profile.location,
 }
 
 type Token = { kind: 'key' | 'string' | 'punct'; text: string }
@@ -70,7 +70,7 @@ lines.push({ indent: 0, tokens: [punct('}')] })
 
       <p class="hero__badge">
         <span class="hero__dot" aria-hidden="true"></span>
-        {profile.status} · {profile.lookingFor}
+        {profile.location} · {profile.workMode}
       </p>
 
       <h1 class="hero__name" id="hero-title">
@@ -91,8 +91,8 @@ lines.push({ indent: 0, tokens: [punct('}')] })
           <Icon name="download" />
           {t.cv.download}
         </Button>
-        <Button href={sectionHref(lang, 'experience')} variant="ghost">
-          {t.ctaExperience}
+        <Button href={MEGA_SERIES_PATHS[lang]} variant="ghost">
+          {t.ctaProject}
         </Button>
       </div>
     </div>
