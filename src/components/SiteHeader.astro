@@ -8,7 +8,9 @@ import {
   type Lang,
   type PagePaths,
 } from '../i18n/ui'
+import { CV_PDF_PATHS } from '../lib/cv'
 
+import Icon from './Icon.astro'
 import ThemeToggle from './ThemeToggle.astro'
 
 interface Props {
@@ -44,6 +46,11 @@ const links = SECTION_KEYS.map((key) => ({
     </nav>
 
     <div class="header__controls">
+      {/* Desktop only: the mobile menu carries the CV link on small screens. */}
+      <a class="cv-link" href={CV_PDF_PATHS[lang]} download aria-label={t.cv.downloadLabel}>
+        <Icon name="download" />
+        CV
+      </a>
       <p class="lang">
         {LANGS.map((code, i) => [
           i > 0 && (
@@ -95,6 +102,10 @@ const links = SECTION_KEYS.map((key) => ({
         ))}
       </ul>
     </nav>
+    <a class="menu__cv" href={CV_PDF_PATHS[lang]} download>
+      <Icon name="download" />
+      {t.cv.download}
+    </a>
   </div>
 </header>
 
@@ -170,6 +181,25 @@ const links = SECTION_KEYS.map((key) => ({
     margin-left: auto;
   }
 
+  .cv-link {
+    display: none;
+    align-items: center;
+    gap: var(--space-1);
+    height: 2.5rem;
+    margin-right: var(--space-2);
+    padding: 0 var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .cv-link:hover {
+    border-color: var(--color-accent-text);
+    color: var(--color-accent-text);
+  }
+
   .lang {
     display: flex;
     gap: var(--space-1);
@@ -226,6 +256,21 @@ const links = SECTION_KEYS.map((key) => ({
     padding: var(--space-3) 0;
     font-size: var(--text-base);
   }
+  .menu__cv {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+    color: var(--color-accent-text);
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    text-decoration: none;
+  }
+  .menu__cv:hover {
+    text-decoration: underline;
+  }
 
   @media (min-width: 64rem) {
     .nav {
@@ -233,6 +278,9 @@ const links = SECTION_KEYS.map((key) => ({
     }
     .header__controls {
       margin-left: 0;
+    }
+    .cv-link {
+      display: inline-flex;
     }
     .menu-button,
     .menu {

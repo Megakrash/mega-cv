@@ -5,12 +5,14 @@ interface Props {
   variant?: 'primary' | 'ghost'
   /** Link to another site: opens in a new tab. */
   external?: boolean
+  /** Link to a file to save rather than open (the CV). */
+  download?: boolean
   hidden?: boolean
   /** Hooks for the client scripts, e.g. `data-email-reveal`. */
   [data: `data-${string}`]: string | boolean | undefined
 }
 
-const { href, variant = 'primary', external = false, ...attributes } = Astro.props
+const { href, variant = 'primary', external = false, download = false, ...attributes } = Astro.props
 const classes = ['button', `button--${variant}`]
 ---
 
@@ -20,6 +22,7 @@ const classes = ['button', `button--${variant}`]
     href={href}
     target={external ? '_blank' : undefined}
     rel={external ? 'noopener noreferrer' : undefined}
+    download={download ? '' : undefined}
     {...attributes}
   >
     <slot />
