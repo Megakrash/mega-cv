@@ -1,0 +1,10 @@
+---
+import NotFound from '../components/NotFound.astro'
+import { PROFILE } from '../data/profile'
+import { UI } from '../i18n/ui'
+import BaseLayout from '../layouts/BaseLayout.astro'
+---
+
+<BaseLayout lang="fr" title={`${UI.fr.notFound.title} · ${PROFILE.fr.name}`}>
+  <NotFound lang="fr" />
+</BaseLayout>

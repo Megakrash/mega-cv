@@ -1,4 +1,5 @@
-import { MEGA_SERIES_PATHS, type Lang, type PagePaths } from '../i18n/ui'
+// Explicit extension: scripts/cv.ts loads this file with Node, which needs it.
+import { MEGA_SERIES_PATHS, type Lang, type PagePaths } from '../i18n/ui.ts'
 
 export const LINKEDIN_URL = 'https://www.linkedin.com/in/jonathanscattolini/'
 export const GITHUB_URL = 'https://github.com/Megakrash'

@@ -1,9 +1,10 @@
 ---
 import { LINKEDIN_URL } from '../data/profile'
 import { UI, type Lang } from '../i18n/ui'
+import { CV_PDF_PATHS } from '../lib/cv'
 
 import Button from './Button.astro'
-import SocialIcon from './SocialIcon.astro'
+import Icon from './Icon.astro'
 
 interface Props {
   lang: Lang
@@ -28,8 +29,12 @@ const t = UI[lang]
       </Button>
     </div>
     <Button href={LINKEDIN_URL} variant="ghost" external>
-      <SocialIcon name="linkedin" />
+      <Icon name="linkedin" />
       LinkedIn
+    </Button>
+    <Button href={CV_PDF_PATHS[lang]} variant="ghost" download>
+      <Icon name="download" />
+      {t.cv.download}
     </Button>
   </div>
 

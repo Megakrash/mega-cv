@@ -36,6 +36,8 @@ export type SectionKey = (typeof SECTION_KEYS)[number]
 interface UiStrings {
   metaTitle: string
   metaDescription: string
+  /** Text alternative of the home page's link preview image. */
+  previewAlt: string
   skipToContent: string
   /** Anchor id (localized) and title of each home page section. */
   sections: Record<SectionKey, { id: string; label: string }>
@@ -43,7 +45,10 @@ interface UiStrings {
   navLabel: string
   menuLabel: string
   themeToggleLabel: string
+  /** Read after the code of the other language (`EN`) in the language switch. */
   switchLanguage: string
+  /** Description of the links that open in a new tab. */
+  newTab: string
   photoAlt: string
   ctaContact: string
   ctaExperience: string
@@ -68,6 +73,27 @@ interface UiStrings {
   emailCopy: string
   emailCopied: string
   emailCopyFailed: string
+  /** The 404 page: its terminal shows a failed `cd`. */
+  notFound: {
+    title: string
+    text: string
+    command: string
+    error: string
+    home: string
+    project: string
+  }
+  /** Download buttons of the CV (PDF) and section titles of the printed CV. */
+  cv: {
+    download: string
+    /** Accessible name of the compact header link. */
+    downloadLabel: string
+    experience: string
+    project: string
+    beforeCode: string
+    hobbies: string
+    /** What the hobbies have in common, before their list. */
+    hobbiesIntro: string
+  }
 }
 
 export const UI = {
@@ -75,6 +101,8 @@ export const UI = {
     metaTitle: 'Jonathan Scattolini · Ingénieur Full Stack',
     metaDescription:
       'Jonathan Scattolini, ingénieur full stack\u00a0: CI/CD, qualité et automatisation pilotées par l’IA.',
+    previewAlt:
+      'Jonathan Scattolini, ingénieur full stack\u00a0: CI/CD, qualité et automatisation pilotées par l’IA. Ouvert aux opportunités.',
     skipToContent: 'Aller au contenu',
     sections: {
       about: { id: 'a-propos', label: 'À propos' },
@@ -89,6 +117,7 @@ export const UI = {
     menuLabel: 'Menu',
     themeToggleLabel: 'Basculer entre thème clair et thème sombre',
     switchLanguage: 'Read in English',
+    newTab: 'S’ouvre dans un nouvel onglet',
     photoAlt: 'Portrait de Jonathan Scattolini',
     ctaContact: 'Me contacter',
     ctaExperience: 'Voir le parcours',
@@ -110,11 +139,30 @@ export const UI = {
     emailCopy: 'Copier',
     emailCopied: 'Adresse copiée',
     emailCopyFailed: 'Copie impossible\u00a0: l’adresse reste sélectionnable',
+    notFound: {
+      title: 'Page introuvable',
+      text: 'Cette page n’existe pas, ou n’existe plus.',
+      command: 'cd ~/cette-page',
+      error: 'cd: aucun fichier ou dossier de ce type: ~/cette-page',
+      home: 'Retour à l’accueil',
+      project: 'Voir le projet mega-series',
+    },
+    cv: {
+      download: 'Télécharger le CV',
+      downloadLabel: 'Télécharger le CV (PDF)',
+      experience: 'Expérience professionnelle',
+      project: 'Projet personnel',
+      beforeCode: 'Expérience avant le code',
+      hobbies: 'Loisirs',
+      hobbiesIntro: 'Jeux de logique et d’automatisation',
+    },
   },
   en: {
     metaTitle: 'Jonathan Scattolini · Full Stack Engineer',
     metaDescription:
       'Jonathan Scattolini, full stack engineer: CI/CD, quality & AI-driven automation.',
+    previewAlt:
+      'Jonathan Scattolini, full stack engineer: CI/CD, quality & AI-driven automation. Open to opportunities.',
     skipToContent: 'Skip to content',
     sections: {
       about: { id: 'about', label: 'About' },
@@ -129,6 +177,7 @@ export const UI = {
     menuLabel: 'Menu',
     themeToggleLabel: 'Switch between light and dark theme',
     switchLanguage: 'Lire en français',
+    newTab: 'Opens in a new tab',
     photoAlt: 'Portrait of Jonathan Scattolini',
     ctaContact: 'Get in touch',
     ctaExperience: 'View experience',
@@ -150,8 +199,31 @@ export const UI = {
     emailCopy: 'Copy',
     emailCopied: 'Address copied',
     emailCopyFailed: 'Couldn’t copy: the address can still be selected',
+    notFound: {
+      title: 'Page not found',
+      text: 'This page doesn’t exist, or no longer does.',
+      command: 'cd ~/this-page',
+      error: 'cd: no such file or directory: ~/this-page',
+      home: 'Back to home',
+      project: 'See the mega-series project',
+    },
+    cv: {
+      download: 'Download CV',
+      downloadLabel: 'Download CV (PDF)',
+      experience: 'Professional experience',
+      project: 'Personal project',
+      beforeCode: 'Experience before code',
+      hobbies: 'Hobbies',
+      hobbiesIntro: 'Logic and automation games',
+    },
   },
 } as const satisfies Record<Lang, UiStrings>
+
+/**
+ * Id of the hidden "opens in a new tab" text (BaseLayout) that links to other
+ * sites point to with aria-describedby.
+ */
+export const NEW_TAB_HINT_ID = 'new-tab-hint'
 
 /**
  * Link to a home page section. It carries the page path so that it also works

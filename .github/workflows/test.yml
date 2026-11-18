@@ -47,3 +47,8 @@ jobs:
       # Catches build-only regressions before the Docker build on deploy does.
       - name: Build
         run: pnpm build
+
+      # The CV PDFs of public/cv/ are printed locally (`pnpm cv`, needs Chrome):
+      # fail when the CV's content or style changed without regenerating them.
+      - name: CV PDFs up to date
+        run: pnpm cv:check

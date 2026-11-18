@@ -4,8 +4,10 @@ import { Picture } from 'astro:assets'
 import photo from '../assets/photo.jpg'
 import { PROFILE } from '../data/profile'
 import { UI, sectionHref, type Lang } from '../i18n/ui'
+import { CV_PDF_PATHS } from '../lib/cv'
 
 import Button from './Button.astro'
+import Icon from './Icon.astro'
 import TerminalWindow from './TerminalWindow.astro'
 
 interface Props {
@@ -85,6 +87,10 @@ lines.push({ indent: 0, tokens: [punct('}')] })
 
       <div class="hero__actions">
         <Button href={sectionHref(lang, 'contact')}>{t.ctaContact}</Button>
+        <Button href={CV_PDF_PATHS[lang]} variant="ghost" download>
+          <Icon name="download" />
+          {t.cv.download}
+        </Button>
         <Button href={sectionHref(lang, 'experience')} variant="ghost">
           {t.ctaExperience}
         </Button>

@@ -72,6 +72,14 @@ export default defineConfig(
     },
   },
 
+  // Node scripts run from the command line: their output is the console.
+  {
+    files: ['scripts/**/*.ts'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
+
   // Prettier config (must be last to override conflicting rules)
   prettierConfig
 )

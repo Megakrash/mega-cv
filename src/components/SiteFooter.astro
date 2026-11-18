@@ -1,9 +1,9 @@
 ---
 import { GITHUB_URL, LINKEDIN_URL } from '../data/profile'
-import { UI, type Lang } from '../i18n/ui'
+import { NEW_TAB_HINT_ID, UI, type Lang } from '../i18n/ui'
 import { APP_VERSION, RELEASE_URL } from '../lib/version'
 
-import SocialIcon from './SocialIcon.astro'
+import Icon from './Icon.astro'
 
 interface Props {
   lang: Lang
@@ -16,14 +16,26 @@ const { lang } = Astro.props
   <div class="footer__inner container">
     <ul class="footer__links">
       <li>
-        <a class="footer__link" href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">
-          <SocialIcon name="linkedin" />
+        <a
+          class="footer__link"
+          href={LINKEDIN_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-describedby={NEW_TAB_HINT_ID}
+        >
+          <Icon name="linkedin" />
           LinkedIn
         </a>
       </li>
       <li>
-        <a class="footer__link" href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
-          <SocialIcon name="github" />
+        <a
+          class="footer__link"
+          href={GITHUB_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-describedby={NEW_TAB_HINT_ID}
+        >
+          <Icon name="github" />
           GitHub
         </a>
       </li>
@@ -35,6 +47,7 @@ const { lang } = Astro.props
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`${UI[lang].versionLabel} ${APP_VERSION}`}
+      aria-describedby={NEW_TAB_HINT_ID}
     >
       {APP_VERSION}
     </a>

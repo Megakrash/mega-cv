@@ -1,0 +1,454 @@
+---
+/*
+ * The CV as one A4 page, printed to PDF by `pnpm cv` (scripts/cv.ts). Only the
+ * `cv-print` build renders it: the site's own build emits no CV page, so the
+ * e-mail address written below never reaches dist/ (only the PDFs carry it).
+ *
+ * Built for print and for applicant tracking systems: real text in a single
+ * column (dates included), reading order = DOM order, no table, no information carried by color
+ * alone (it must read in black and white). Static Geist fonts, not the variable
+ * ones of the site: Chrome embeds variable fonts as Type 3 glyphs in PDFs.
+ */
+import '@fontsource/geist/latin-400.css'
+import '@fontsource/geist/latin-600.css'
+import '@fontsource/geist/latin-700.css'
+import '@fontsource/geist-mono/latin-400.css'
+import geist400Url from '@fontsource/geist/files/geist-latin-400-normal.woff2?url'
+import geist600Url from '@fontsource/geist/files/geist-latin-600-normal.woff2?url'
+import geist700Url from '@fontsource/geist/files/geist-latin-700-normal.woff2?url'
+import geistMono400Url from '@fontsource/geist-mono/files/geist-mono-latin-400-normal.woff2?url'
+import { Image } from 'astro:assets'
+
+import photo from '../../assets/photo.jpg'
+import DateRange from '../../components/DateRange.astro'
+import {
+  EDUCATION,
+  EMAIL_PARTS,
+  EXPERIENCES,
+  GITHUB_URL,
+  HOBBIES,
+  LINKEDIN_URL,
+  PAST_CAREER,
+  PROFILE,
+  PROJECTS,
+  SKILLS,
+  localize,
+} from '../../data/profile'
+import { HOME_PATHS, LANGS, UI, type Lang } from '../../i18n/ui'
+import { CV_PRINT_MODE, cvMetadata } from '../../lib/cv'
+
+export function getStaticPaths() {
+  if (import.meta.env.MODE !== CV_PRINT_MODE) return []
+  return LANGS.map((lang) => ({ params: { lang }, props: { lang } }))
+}
+
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+const t = UI[lang]
+const profile = PROFILE[lang]
+const site = Astro.site
+if (!site) throw new Error('`site` must be set in astro.config.mjs (links of the CV).')
+
+const email = `${EMAIL_PARTS.user}@${EMAIL_PARTS.domain}`
+const siteUrl = new URL(HOME_PATHS[lang], site).href
+const contacts = [siteUrl, LINKEDIN_URL, GITHUB_URL]
+/** French puts a no-break space before a colon. */
+const colon = lang === 'fr' ? ' : ' : ': '
+
+/** A URL as printed on paper: no protocol, no `www.`, no trailing slash. */
+function bare(url: string): string {
+  return url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')
+}
+
+/** "Membre fondateur" → "membre fondateur", inside parentheses. */
+function lowerFirst(text: string): string {
+  return text.charAt(0).toLowerCase() + text.slice(1)
+}
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <title>{cvMetadata(lang).title}</title>
+    {/* Loaded before printing: Chrome waits for preloads before the load event. */}
+    {[geist400Url, geist600Url, geist700Url, geistMono400Url].map((url) => (
+      <link rel="preload" href={url} as="font" type="font/woff2" crossorigin />
+    ))}
+  </head>
+  <body>
+    <header class="header">
+      <div>
+        <h1 class="name">{profile.name}</h1>
+        <p class="headline">
+          <span class="headline__job">{profile.jobTitle}</span>
+          <span class="headline__tagline">{` · ${profile.tagline}`}</span>
+        </p>
+        <ul class="contacts">
+          <li>
+            <a href={`mailto:${email}`}>{email}</a>
+          </li>
+          {contacts.map((url) => (
+            <li>
+              <a href={url}>{bare(url)}</a>
+            </li>
+          ))}
+        </ul>
+        <p class="status">
+          {profile.location} · {profile.status} · {profile.lookingFor}
+        </p>
+      </div>
+      {
+        /* Photos are customary on French CVs, discouraged on English-language ones. */
+        lang === 'fr' && (
+          <div class="photo">
+            <Image
+              src={photo}
+              width={240}
+              height={240}
+              format="jpg"
+              quality={85}
+              alt={t.photoAlt}
+            />
+          </div>
+        )
+      }
+    </header>
+
+    <p class="pitch">{profile.pitch}</p>
+
+    <section class="section">
+      <h2 class="section__title">{t.cv.experience}</h2>
+      {EXPERIENCES.map((experience) => (
+        <article>
+          <h3 class="entry">
+            <a href={experience.url}>{experience.company}</a>
+            <span class="muted">{` · ${experience.description[lang]}`}</span>
+          </h3>
+          {experience.roles.map((role) => (
+            <div class="role">
+              <p>
+                <strong>{role.title[lang]}</strong>
+                {` · ${role.contract[lang]} · `}
+                <span class="date">
+                  <DateRange period={role} lang={lang} />
+                </span>
+              </p>
+              <p class="muted">{role.summary[lang]}</p>
+            </div>
+          ))}
+          <h4 class="label">{t.highlightsTitle}</h4>
+          <ul class="bullets">
+            {experience.highlights.map((highlight) => (
+              <li>{highlight[lang]}</li>
+            ))}
+          </ul>
+        </article>
+      ))}
+    </section>
+
+    <section class="section">
+      <h2 class="section__title">{t.cv.project}</h2>
+      {PROJECTS.map((project) => {
+        const page = project.page && new URL(project.page[lang], site).href
+        return (
+          <article>
+            <h3 class="entry">
+              <a href={project.url}>{project.name}</a>
+              <span class="muted">
+                {' · '}
+                <a href={project.url}>{bare(project.url)}</a>
+                {page && (
+                  <>
+                    {' · '}
+                    <a href={page}>{bare(page)}</a>
+                  </>
+                )}
+                {' · '}
+              </span>
+              <span class="date">{t.inProduction}</span>
+            </h3>
+            <p>{project.description[lang]}</p>
+            <ul class="bullets">
+              {project.highlights.map((highlight) => (
+                <li>{highlight[lang]}</li>
+              ))}
+            </ul>
+            <p class="muted">
+              <span class="label">
+                {t.stackLabel}
+                {colon}
+              </span>
+              {project.stack.join(', ')}
+            </p>
+          </article>
+        )
+      })}
+    </section>
+
+    <section class="section">
+      <h2 class="section__title">{t.sections.skills.label}</h2>
+      <ul class="rows">
+        {SKILLS.map((group) => (
+          <li>
+            <span class="label">
+              {group.title[lang]}
+              {colon}
+            </span>
+            {group.items.map((item) => localize(item, lang)).join(', ')}
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2 class="section__title">{t.educationTitle}</h2>
+      <ul class="rows">
+        {EDUCATION.map((item) => (
+          <li>
+            <p>
+              <strong>{item.title[lang]}</strong>
+              {'school' in item && ` · ${item.school}`}
+              {' · '}
+              <span class="date">
+                <DateRange period={item.date} lang={lang} />
+              </span>
+            </p>
+            {'details' in item && <p class="muted">{item.details[lang]}</p>}
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2 class="section__title">{t.cv.beforeCode}</h2>
+      <ul class="rows">
+        {PAST_CAREER.positions.map((position) => (
+          <li>
+            <strong>{position.role[lang]}</strong>
+            {` · ${position.organization}`}
+            {'about' in position && <span class="muted">{`, ${position.about[lang]}`}</span>}
+            {' · '}
+            <span class="date">
+              <DateRange period={position} lang={lang} />
+            </span>
+          </li>
+        ))}
+        <li>
+          <span class="label">
+            {t.strengthsLabel}
+            {colon}
+          </span>
+          {PAST_CAREER.strengths[lang].join(', ')}
+        </li>
+        <li>
+          <span class="label">
+            {t.associationsTitle}
+            {colon}
+          </span>
+          {PAST_CAREER.associations.map((association, i) => (
+            <>
+              {i > 0 && ', '}
+              {association.organization} ({lowerFirst(association.role[lang])},{' '}
+              <DateRange period={association} lang={lang} />)
+            </>
+          ))}
+        </li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2 class="section__title">{t.cv.hobbies}</h2>
+      <p>
+        {t.cv.hobbiesIntro}
+        {colon}
+        {HOBBIES.join(', ')}
+      </p>
+    </section>
+  </body>
+</html>
+
+<style>
+  @page {
+    size: A4;
+    margin: 8mm 11mm;
+  }
+
+  html {
+    /* Keep the orange accents when printing. */
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color-scheme: light;
+    --text: #141922;
+    /* The lightest text color: still dark enough in black and white. */
+    --muted: #566070;
+    --accent: #f89b22;
+    --accent-text: #a85200;
+    --rule: #dde1e8;
+  }
+
+  body {
+    margin: 0;
+    background: #fff;
+    color: var(--text);
+    font-family: Geist, sans-serif;
+    font-size: 8.5pt;
+    line-height: 1.3;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  ul {
+    margin: 0;
+    padding: 0;
+    font-size: inherit;
+  }
+  ul {
+    list-style: none;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  strong,
+  h3 {
+    font-weight: 600;
+  }
+
+  .muted {
+    color: var(--muted);
+  }
+  .label {
+    font-weight: 600;
+  }
+
+  /* Header: identity and contact details, photo on the right (French CV). */
+  .header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 6mm;
+  }
+  .name {
+    font-size: 19pt;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .headline {
+    margin-top: 0.8mm;
+    font-size: 10pt;
+  }
+  .headline__job {
+    color: var(--accent-text);
+    font-weight: 600;
+  }
+  .headline__tagline {
+    color: var(--muted);
+  }
+  .contacts {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 1.5mm;
+    font-size: 8pt;
+  }
+  .contacts li + li::before {
+    content: '·';
+    margin-inline: 1.2mm;
+    color: var(--muted);
+  }
+  .status {
+    margin-top: 0.3mm;
+    color: var(--muted);
+    font-size: 8pt;
+  }
+  .photo {
+    width: 20mm;
+    padding: 0.6mm;
+    border: 0.6mm solid var(--accent);
+    border-radius: 50%;
+  }
+  .photo :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 50%;
+  }
+
+  .pitch {
+    margin-top: 2.5mm;
+  }
+
+  /* Section title: small capitals followed by a thin orange rule. */
+  .section {
+    margin-top: 2.5mm;
+  }
+  .section__title {
+    display: flex;
+    align-items: center;
+    gap: 2.5mm;
+    margin-bottom: 1mm;
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .section__title::after {
+    content: '';
+    flex: 1;
+    border-top: 0.3mm solid var(--accent);
+  }
+
+  .entry {
+    font-size: 9pt;
+  }
+
+  /* Dates follow their item on the same line, never in a right-hand column:
+     PDF text extraction (and applicant tracking systems) would read such a
+     column apart from the items. */
+  .date {
+    color: var(--muted);
+    font-family: 'Geist Mono', monospace;
+    font-size: 7.5pt;
+    font-weight: 400;
+  }
+
+  .role {
+    margin-top: 0.8mm;
+  }
+  h4.label {
+    margin-top: 1mm;
+  }
+
+  .bullets li {
+    position: relative;
+    padding-left: 3mm;
+  }
+  .bullets li + li {
+    margin-top: 0.4mm;
+  }
+  .bullets li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--accent-text);
+    font-weight: 700;
+  }
+
+  .rows li + li {
+    margin-top: 0.4mm;
+  }
+
+  /* Each block stays whole on a page (the CV must hold on one anyway). */
+  article,
+  .rows li,
+  .bullets li {
+    break-inside: avoid;
+  }
+</style>
