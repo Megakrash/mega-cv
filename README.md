@@ -25,16 +25,16 @@ pnpm dev              # http://localhost:4321 (French) and http://localhost:4321
 
 ## Scripts
 
-| Script              | What it does                                                       |
-| ------------------- | ------------------------------------------------------------------ |
-| `pnpm dev`          | Dev server with hot reload                                         |
-| `pnpm build`        | Static build into `dist/`                                          |
-| `pnpm preview`      | Serves the `dist/` build locally                                   |
-| `pnpm check`        | Type-checks `.astro` and `.ts` (`astro check`)                     |
-| `pnpm lint`         | ESLint, zero warnings allowed                                      |
-| `pnpm format:check` | Prettier check (`pnpm format` to fix)                              |
-| `pnpm cv`           | Prints the CV PDFs that changed into `public/cv/` (`--force`: all) |
-| `pnpm cv:check`     | Fails if a CV PDF no longer matches the site's content (no Chrome) |
+| Script              | What it does                                                             |
+| ------------------- | ------------------------------------------------------------------------ |
+| `pnpm dev`          | Dev server with hot reload                                               |
+| `pnpm build`        | Static build into `dist/`                                                |
+| `pnpm preview`      | Serves the `dist/` build locally                                         |
+| `pnpm check`        | Type-checks `.astro` and `.ts` (`astro check`)                           |
+| `pnpm lint`         | ESLint, zero warnings allowed                                            |
+| `pnpm format:check` | Prettier check (`pnpm format` to fix)                                    |
+| `pnpm cv`           | Makes the CV PDFs and link preview images that changed (`--force`: all)  |
+| `pnpm cv:check`     | Fails if a PDF or preview image no longer matches its source (no Chrome) |
 
 CI (`.github/workflows/test.yml`) runs lint, format, check, build and `cv:check` on every push to
 `dev` and `main`.
@@ -47,13 +47,21 @@ lays it out, `pnpm cv` builds it in a temporary folder and prints it with the lo
 never part of the site's build, which keeps the e-mail address it prints out of the site's HTML.
 After changing anything the CV shows, run `pnpm cv` and commit the PDFs: CI fails otherwise.
 
+## Link previews
+
+Shared links (LinkedIn, mail, chat apps) show a 1200×630 card per page and locale, through Open
+Graph tags. `src/pages/og/[card].astro` lays the cards out from the site's data, and `pnpm cv`
+captures them with the same headless Chrome into `src/assets/og/` (committed). Like the PDFs,
+they are checked by `pnpm cv:check`.
+
 ## Layout
 
 ```
 src/
   pages/            index.astro (FR, /) and en/index.astro (EN, /en/), then the mega-series
                     page: projets/mega-series.astro and en/projects/mega-series.astro, and the
-                    CV print page cv-print/[lang].astro (only built by `pnpm cv`)
+                    CV print page cv-print/[lang].astro and the preview cards og/[card].astro
+                    (only built by `pnpm cv`), 404.astro and en/404.astro
   layouts/          page shell (<head>, hreflang links, header, footer)
   components/       header, footer, hero, sections, project page and base components
   data/profile.ts   profile content of both languages (shared with the CV)
@@ -61,10 +69,12 @@ src/
   i18n/ui.ts        UI strings of both languages, page paths, home page sections
   lib/version.ts    site version shown in the footer
   lib/cv.ts         CV PDF paths and metadata
-  assets/           images optimized at build time (photo, mega-series screenshots)
+  lib/og.ts         link preview cards: list, size, image paths
+  assets/           images optimized at build time (photo, mega-series screenshots) and the
+                    link preview images og/ (made by `pnpm cv`)
   styles/           design tokens and global CSS
 public/             files copied as is (favicon, theme-init.js, cv/ PDFs)
-scripts/cv.ts       prints the CV PDFs (pnpm cv, pnpm cv:check)
+scripts/cv.ts       makes the CV PDFs and preview images (pnpm cv, pnpm cv:check)
 docker/             nginx config and security headers of the production image
 ```
 
@@ -105,8 +115,9 @@ docker run --rm -p 8090:80 mega-cv:local     # http://localhost:8090
 ```
 
 Multi-stage build: Node (pnpm install + `astro build`) then `nginx:alpine-slim` serving `dist/`
-with long-cached `/_astro/` assets, revalidated pages and security headers, including an enforced
-Content Security Policy (`docker/security-headers.conf`).
+with long-cached `/_astro/` assets, revalidated pages, the site's own 404 page of each locale and
+security headers, including an enforced Content Security Policy and a one-year HSTS
+(`docker/security-headers.conf`).
 
 ## Deployment
 

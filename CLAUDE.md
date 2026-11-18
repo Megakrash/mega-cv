@@ -46,9 +46,24 @@ style, changed without `pnpm cv`: after such a change, run `pnpm cv` and commit 
 - Keep the print page readable by applicant tracking systems: real text in a single column, dates
   inline after their item (a right-hand date column is read apart from the items), static Geist
   fonts (Chrome embeds variable fonts as Type 3 glyphs), black-and-white legible.
-- `scripts/cv.ts` runs on Node directly, so `src/lib/cv.ts`, `src/data/profile.ts` and
-  `src/i18n/ui.ts` import each other with explicit `.ts` extensions and use only erasable
+- `scripts/cv.ts` runs on Node directly, so `src/lib/cv.ts`, `src/lib/og.ts`, `src/data/profile.ts`
+  and `src/i18n/ui.ts` import each other with explicit `.ts` extensions and use only erasable
   TypeScript syntax (no enum, no namespace), and must not import assets.
+
+## Link previews and 404
+
+- Each page that can be shared passes a `preview` (image + alt) to `BaseLayout`, which then renders
+  the Open Graph tags (absolute URLs, `og:locale`, `twitter:card`) and the hreflang links; the 404
+  pages pass none. It is for sharing (LinkedIn, mail, chat apps), not for search engines.
+- The images are 1200×630 cards, one per page and locale
+  (`src/assets/og/{home,mega-series}-{fr,en}.png`, committed, served hashed under `/_astro/`).
+  `src/pages/og/[card].astro` lays them out from the site's data and tokens, only in the
+  `cv-print` build, and `pnpm cv` captures them with Chrome: like the PDFs, each PNG records the
+  hash of its HTML (a `tEXt` chunk) and `pnpm cv:check` fails when one is out of date. After
+  changing what a card shows, run `pnpm cv` and commit the PNGs.
+- 404: `src/pages/404.astro` and `src/pages/en/404.astro` (body in `NotFound.astro`). nginx serves
+  the English one for paths under `/en/`, the French one elsewhere, with a real 404 status and the
+  security headers; a folder without an index (403) gets it too (`docker/nginx.conf`).
 
 ## Conventions
 
@@ -60,7 +75,8 @@ style, changed without `pnpm cv`: after such a change, run `pnpm cv` and commit 
   `« »`, narrow no-break space before `;`, `!` and `?`. In TS strings, write them as `\u00a0`
   and `\u202f` so they stay visible in the source.
 - Links to other sites open in a new tab (`target="_blank" rel="noopener noreferrer"`; the
-  `external` prop of `Button.astro`).
+  `external` prop of `Button.astro`) and point to the hidden "opens in a new tab" text of
+  `BaseLayout` with `aria-describedby={NEW_TAB_HINT_ID}`.
 - The email address is never written in static HTML: it is assembled in JavaScript and revealed
   on click. The CV PDFs are the only place it is written in clear (by the print page, which the
   site's build never emits). No phone number anywhere, neither on the site nor on the CV.
