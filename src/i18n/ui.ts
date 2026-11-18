@@ -68,6 +68,18 @@ interface UiStrings {
   emailCopy: string
   emailCopied: string
   emailCopyFailed: string
+  /** Download buttons of the CV (PDF) and section titles of the printed CV. */
+  cv: {
+    download: string
+    /** Accessible name of the compact header link. */
+    downloadLabel: string
+    experience: string
+    project: string
+    beforeCode: string
+    hobbies: string
+    /** What the hobbies have in common, before their list. */
+    hobbiesIntro: string
+  }
 }
 
 export const UI = {
@@ -110,6 +122,15 @@ export const UI = {
     emailCopy: 'Copier',
     emailCopied: 'Adresse copiée',
     emailCopyFailed: 'Copie impossible\u00a0: l’adresse reste sélectionnable',
+    cv: {
+      download: 'Télécharger le CV',
+      downloadLabel: 'Télécharger le CV (PDF)',
+      experience: 'Expérience professionnelle',
+      project: 'Projet personnel',
+      beforeCode: 'Expérience avant le code',
+      hobbies: 'Loisirs',
+      hobbiesIntro: 'Jeux de logique et d’automatisation',
+    },
   },
   en: {
     metaTitle: 'Jonathan Scattolini · Full Stack Engineer',
@@ -150,6 +171,15 @@ export const UI = {
     emailCopy: 'Copy',
     emailCopied: 'Address copied',
     emailCopyFailed: 'Couldn’t copy: the address can still be selected',
+    cv: {
+      download: 'Download CV',
+      downloadLabel: 'Download CV (PDF)',
+      experience: 'Professional experience',
+      project: 'Personal project',
+      beforeCode: 'Experience before code',
+      hobbies: 'Hobbies',
+      hobbiesIntro: 'Logic and automation games',
+    },
   },
 } as const satisfies Record<Lang, UiStrings>
 
