@@ -7,6 +7,7 @@ allowed-tools:
   - 'Bash(git fetch:*)'
   - 'Bash(git show:*)'
   - 'Bash(git tag:*)'
+  - 'Bash(pnpm cv:check)'
   - Read
   - Edit
   - Grep
@@ -47,6 +48,10 @@ Use the conversation context too when the work was just done. Suggest the bump l
 - **major** only if the user asks (e.g. the first public launch as `v1.0.0`).
 
 If `dev` brings nothing over `main`, say so and stop.
+
+Then check that the CV PDFs (`public/cv/`) match the site's content: `pnpm cv:check`. If it fails,
+stop before any bump: tell the user to run `pnpm cv` (prints them with the local Chrome), to commit
+the PDFs through `/commit`, then to run `/release` again. CI fails on the same check.
 
 ## Step 3: Ask for the version
 
