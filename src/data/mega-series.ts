@@ -31,12 +31,18 @@ export const MEGA_SERIES = {
   },
   /** When the figures below were measured. */
   figuresNote: { fr: 'Chiffres de novembre 2026', en: 'Figures as of November 2026' },
+  /** Text alternative of the page's link preview image. */
+  previewAlt: {
+    fr: 'mega-series, en production : application de suivi de séries et de films, avec une capture de la collection de séries en cours.',
+    en: 'mega-series, in production: a TV series and movie tracker, with a screenshot of the collection of shows in progress.',
+  },
 } as const satisfies {
   metaTitle: string
   metaDescription: Localized
   path: Localized
   pitch: Localized
   figuresNote: Localized
+  previewAlt: Localized
 }
 
 /** Key figures: each reads as one sentence, the value first. */

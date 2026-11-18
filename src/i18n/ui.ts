@@ -36,6 +36,8 @@ export type SectionKey = (typeof SECTION_KEYS)[number]
 interface UiStrings {
   metaTitle: string
   metaDescription: string
+  /** Text alternative of the home page's link preview image. */
+  previewAlt: string
   skipToContent: string
   /** Anchor id (localized) and title of each home page section. */
   sections: Record<SectionKey, { id: string; label: string }>
@@ -87,6 +89,8 @@ export const UI = {
     metaTitle: 'Jonathan Scattolini · Ingénieur Full Stack',
     metaDescription:
       'Jonathan Scattolini, ingénieur full stack\u00a0: CI/CD, qualité et automatisation pilotées par l’IA.',
+    previewAlt:
+      'Jonathan Scattolini, ingénieur full stack\u00a0: CI/CD, qualité et automatisation pilotées par l’IA. Ouvert aux opportunités.',
     skipToContent: 'Aller au contenu',
     sections: {
       about: { id: 'a-propos', label: 'À propos' },
@@ -136,6 +140,8 @@ export const UI = {
     metaTitle: 'Jonathan Scattolini · Full Stack Engineer',
     metaDescription:
       'Jonathan Scattolini, full stack engineer: CI/CD, quality & AI-driven automation.',
+    previewAlt:
+      'Jonathan Scattolini, full stack engineer: CI/CD, quality & AI-driven automation. Open to opportunities.',
     skipToContent: 'Skip to content',
     sections: {
       about: { id: 'about', label: 'About' },

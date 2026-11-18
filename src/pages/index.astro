@@ -1,8 +1,10 @@
 ---
+import preview from '../assets/og/home-fr.png'
 import Home from '../components/Home.astro'
+import { UI } from '../i18n/ui'
 import BaseLayout from '../layouts/BaseLayout.astro'
 ---
 
-<BaseLayout lang="fr">
+<BaseLayout lang="fr" preview={{ image: preview, alt: UI.fr.previewAlt }}>
   <Home lang="fr" />
 </BaseLayout>

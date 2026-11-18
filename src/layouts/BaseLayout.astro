@@ -2,9 +2,11 @@
 import '@fontsource-variable/geist'
 import '@fontsource-variable/geist-mono'
 import geistLatinUrl from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url'
+import type { ImageMetadata } from 'astro'
 
 import SiteFooter from '../components/SiteFooter.astro'
 import SiteHeader from '../components/SiteHeader.astro'
+import { PROFILE } from '../data/profile'
 import { HOME_PATHS, LANGS, UI, type Lang, type PagePaths } from '../i18n/ui'
 import '../styles/global.css'
 
@@ -15,12 +17,22 @@ interface Props {
   /** Defaults to the site title and description. */
   title?: string
   description?: string
+  /**
+   * Link preview image (src/assets/og/, made by `pnpm cv`). Only the pages
+   * that have one get the Open Graph tags and the hreflang links: not the 404s.
+   */
+  preview?: { image: ImageMetadata; alt: string }
 }
 
-const { lang, paths = HOME_PATHS, title, description } = Astro.props
+/** Open Graph locale of each site language. */
+const OG_LOCALES = { fr: 'fr_FR', en: 'en_US' } as const satisfies Record<Lang, string>
+
+const { lang, paths = HOME_PATHS, title, description, preview } = Astro.props
 const t = UI[lang]
 const site = Astro.site
-if (!site) throw new Error('`site` must be set in astro.config.mjs (used for the hreflang links).')
+if (!site) throw new Error('`site` must be set in astro.config.mjs (absolute links of <head>).')
+const pageTitle = title ?? t.metaTitle
+const pageDescription = description ?? t.metaDescription
 ---
 
 <!doctype html>
@@ -30,15 +42,36 @@ if (!site) throw new Error('`site` must be set in astro.config.mjs (used for the
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- Blocking on purpose: sets the stored theme before the first paint. -->
     <script is:inline src="/theme-init.js"></script>
-    <title>{title ?? t.metaTitle}</title>
-    <meta name="description" content={description ?? t.metaDescription} />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
     <meta name="color-scheme" content="light dark" />
     <link rel="preload" href={geistLatinUrl} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    {LANGS.map((code) => (
-      <link rel="alternate" hreflang={code} href={new URL(paths[code], site)} />
-    ))}
-    <link rel="alternate" hreflang="x-default" href={new URL(paths.fr, site)} />
+    {preview && (
+      <>
+        {LANGS.map((code) => (
+          <link rel="alternate" hreflang={code} href={new URL(paths[code], site)} />
+        ))}
+        <link rel="alternate" hreflang="x-default" href={new URL(paths.fr, site)} />
+
+        {/* Link previews (LinkedIn, mail, chat apps): absolute URLs only. */}
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content={PROFILE[lang].name} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:url" content={new URL(paths[lang], site)} />
+        <meta property="og:locale" content={OG_LOCALES[lang]} />
+        {LANGS.filter((code) => code !== lang).map((code) => (
+          <meta property="og:locale:alternate" content={OG_LOCALES[code]} />
+        ))}
+        <meta property="og:image" content={new URL(preview.image.src, site)} />
+        <meta property="og:image:type" content={`image/${preview.image.format}`} />
+        <meta property="og:image:width" content={String(preview.image.width)} />
+        <meta property="og:image:height" content={String(preview.image.height)} />
+        <meta property="og:image:alt" content={preview.alt} />
+        <meta name="twitter:card" content="summary_large_image" />
+      </>
+    )}
   </head>
   <body>
     <a class="skip-link" href="#main">
