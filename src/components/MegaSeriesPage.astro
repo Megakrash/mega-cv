@@ -1,20 +1,13 @@
 ---
-import { Picture, getImage } from 'astro:assets'
-
-import {
-  MEGA_SERIES,
-  MEGA_SERIES_FIGURES,
-  MEGA_SERIES_SCREENSHOTS,
-  MEGA_SERIES_SECTIONS,
-} from '../data/mega-series'
+import { MEGA_SERIES, MEGA_SERIES_FIGURES, MEGA_SERIES_SECTIONS } from '../data/mega-series'
 import { PROJECTS } from '../data/profile'
 import { UI, sectionHref, type Lang } from '../i18n/ui'
 
 import ArchitectureDiagram from './ArchitectureDiagram.astro'
 import Button from './Button.astro'
+import ScreenshotGallery from './ScreenshotGallery.astro'
 import Section from './Section.astro'
 import TagList from './TagList.astro'
-import TerminalWindow from './TerminalWindow.astro'
 
 /** Body of the mega-series project page. */
 interface Props {
@@ -28,14 +21,6 @@ const project = PROJECTS.find((item) => item.name === 'mega-series')
 if (!project) throw new Error('mega-series is missing from PROJECTS (src/data/profile.ts).')
 const hostname = new URL(project.url).hostname
 const backHref = sectionHref(lang, 'projects')
-
-// Each screenshot opens its full-size version.
-const screenshots = await Promise.all(
-  MEGA_SERIES_SCREENSHOTS.map(async (shot) => ({
-    ...shot,
-    full: await getImage({ src: shot.image, format: 'webp' }),
-  }))
-)
 ---
 
 <header class="intro">
@@ -85,29 +70,7 @@ const screenshots = await Promise.all(
         ))}
       </ul>
     )}
-    {section.key === 'screenshots' && (
-      <ul class="gallery">
-        {screenshots.map((shot) => (
-          <li>
-            <figure class="shot">
-              <a class="shot__link" href={shot.full.src}>
-                <TerminalWindow title={shot.url} flush>
-                  <Picture
-                    src={shot.image}
-                    formats={['avif', 'webp']}
-                    fallbackFormat="webp"
-                    widths={[600, 900, 1200]}
-                    sizes="(min-width: 72rem) 35rem, (min-width: 48rem) 50vw, 100vw"
-                    alt={shot.alt[lang]}
-                  />
-                </TerminalWindow>
-              </a>
-              <figcaption class="shot__caption">{shot.caption[lang]}</figcaption>
-            </figure>
-          </li>
-        ))}
-      </ul>
-    )}
+    {section.key === 'screenshots' && <ScreenshotGallery lang={lang} />}
   </Section>
 ))}
 
@@ -241,35 +204,6 @@ const screenshots = await Promise.all(
     font-size: var(--text-lg);
   }
 
-  .gallery {
-    display: grid;
-    gap: var(--space-6) var(--space-5);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-  .shot {
-    margin: 0;
-  }
-  .shot__link {
-    display: block;
-    border-radius: var(--radius-lg);
-    text-decoration: none;
-  }
-  .shot__link:hover {
-    box-shadow: 0 0 0 1px var(--color-accent-text);
-  }
-  .shot__link :global(img) {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-  .shot__caption {
-    margin-top: var(--space-3);
-    color: var(--color-muted);
-    font-size: var(--text-sm);
-  }
-
   .outro {
     display: flex;
     flex-wrap: wrap;
@@ -282,12 +216,6 @@ const screenshots = await Promise.all(
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-3);
-  }
-
-  @media (min-width: 48rem) {
-    .gallery {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
   }
 
   @media (min-width: 64rem) {

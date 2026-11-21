@@ -72,6 +72,13 @@ interface UiStrings {
   /** Link from a project card to the project page, and back. */
   projectDetails: string
   backToProjects: string
+  /** The screenshot viewer (a modal dialog) and its buttons. */
+  viewer: {
+    label: string
+    close: string
+    previous: string
+    next: string
+  }
   contactIntro: string
   emailReveal: string
   emailCopy: string
@@ -137,6 +144,12 @@ export const UI = {
     inProduction: 'En production',
     projectDetails: 'Voir le projet en détail',
     backToProjects: 'Retour aux projets',
+    viewer: {
+      label: 'Visionneuse de captures d’écran',
+      close: 'Fermer',
+      previous: 'Capture précédente',
+      next: 'Capture suivante',
+    },
     contactIntro:
       'Un poste, un projet ou simplement une question\u202f? Le plus simple est d’écrire un e-mail ou un message sur LinkedIn.',
     emailReveal: 'Afficher l’adresse e-mail',
@@ -197,6 +210,12 @@ export const UI = {
     inProduction: 'In production',
     projectDetails: 'View project details',
     backToProjects: 'Back to projects',
+    viewer: {
+      label: 'Screenshot viewer',
+      close: 'Close',
+      previous: 'Previous screenshot',
+      next: 'Next screenshot',
+    },
     contactIntro:
       'A role, a project or just a question? Email or a LinkedIn message is the easiest way to reach me.',
     emailReveal: 'Show email address',
