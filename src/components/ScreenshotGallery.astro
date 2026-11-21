@@ -1,0 +1,398 @@
+---
+import { Picture, getImage } from 'astro:assets'
+
+import { MEGA_SERIES_SCREENSHOTS } from '../data/mega-series'
+import { UI, type Lang } from '../i18n/ui'
+
+import Icon from './Icon.astro'
+import TerminalWindow from './TerminalWindow.astro'
+
+/**
+ * The mega-series screenshots, and the viewer that shows them full size in a
+ * modal dialog without leaving the page.
+ */
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+const t = UI[lang].viewer
+
+// Each thumbnail links to its full-size image: what a click does without
+// JavaScript, or a modified click (new tab, download).
+const shots = await Promise.all(
+  MEGA_SERIES_SCREENSHOTS.map(async (shot) => ({
+    ...shot,
+    full: await getImage({ src: shot.image, format: 'webp' }),
+  }))
+)
+---
+
+<ul class="gallery">
+  {shots.map((shot) => (
+    <li>
+      <figure class="shot">
+        <a class="shot__link" href={shot.full.src} data-viewer-link>
+          <TerminalWindow title={shot.url} flush>
+            <Picture
+              src={shot.image}
+              formats={['avif', 'webp']}
+              fallbackFormat="webp"
+              widths={[600, 900, 1200]}
+              sizes="(min-width: 72rem) 35rem, (min-width: 48rem) 50vw, 100vw"
+              alt={shot.alt[lang]}
+            />
+          </TerminalWindow>
+          <span class="shot__zoom" aria-hidden="true">
+            <Icon name="expand" />
+          </span>
+        </a>
+        <figcaption class="shot__caption">{shot.caption[lang]}</figcaption>
+      </figure>
+    </li>
+  ))}
+</ul>
+
+<dialog class="viewer" aria-label={t.label} data-viewer>
+  <div class="viewer__bar">
+    <p class="viewer__counter" aria-live="polite" data-viewer-counter></p>
+    <button
+      class="viewer__button"
+      type="button"
+      aria-label={t.close}
+      title={t.close}
+      data-viewer-close
+    >
+      <Icon name="close" size={24} />
+    </button>
+  </div>
+  <button
+    class="viewer__button viewer__previous"
+    type="button"
+    aria-label={t.previous}
+    title={t.previous}
+    data-viewer-previous
+  >
+    <Icon name="chevronLeft" size={24} />
+  </button>
+  {/* Lazy images: a shot loads only once shown (or once the viewer opens). */}
+  {shots.map((shot) => (
+    <figure class="viewer__slide" hidden data-viewer-slide>
+      <Picture
+        src={shot.image}
+        formats={['avif', 'webp']}
+        fallbackFormat="webp"
+        widths={[600, 900, 1200, shot.image.width]}
+        sizes="100vw"
+        alt={shot.alt[lang]}
+      />
+      <figcaption class="viewer__caption">
+        <span class="viewer__url">{shot.url}</span>
+        <span>{shot.caption[lang]}</span>
+      </figcaption>
+    </figure>
+  ))}
+  <button
+    class="viewer__button viewer__next"
+    type="button"
+    aria-label={t.next}
+    title={t.next}
+    data-viewer-next
+  >
+    <Icon name="chevronRight" size={24} />
+  </button>
+</dialog>
+
+<script>
+  // A plain click on a thumbnail opens the viewer instead of the image file, so
+  // the page never changes. The dialog closes natively on Escape (and the
+  // Android back gesture), and here on its button or a click beside the image.
+  // The buttons, the arrow keys and a swipe go through the shots, in a loop.
+  const viewer = document.querySelector<HTMLDialogElement>('[data-viewer]')
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-viewer-link]')]
+  const slides = [...(viewer?.querySelectorAll<HTMLElement>('[data-viewer-slide]') ?? [])]
+  const counter = viewer?.querySelector<HTMLElement>('[data-viewer-counter]')
+
+  if (viewer && counter && slides.length > 0 && slides.length === links.length) {
+    let current = 0
+
+    const show = (index: number) => {
+      current = (index + slides.length) % slides.length
+      slides.forEach((slide, i) => {
+        slide.hidden = i !== current
+      })
+      counter.textContent = `${current + 1} / ${slides.length}`
+    }
+
+    links.forEach((link, index) => {
+      link.setAttribute('aria-haspopup', 'dialog')
+      link.addEventListener('click', (event) => {
+        if (
+          event.button !== 0 ||
+          event.metaKey ||
+          event.ctrlKey ||
+          event.shiftKey ||
+          event.altKey
+        ) {
+          return
+        }
+        event.preventDefault()
+        show(index)
+        viewer.showModal()
+        // Fetch the other shots now, so that going through them is instant.
+        viewer.querySelectorAll('img').forEach((img) => {
+          img.loading = 'eager'
+        })
+      })
+    })
+
+    viewer
+      .querySelector('[data-viewer-previous]')
+      ?.addEventListener('click', () => show(current - 1))
+    viewer.querySelector('[data-viewer-next]')?.addEventListener('click', () => show(current + 1))
+    viewer.querySelector('[data-viewer-close]')?.addEventListener('click', () => viewer.close())
+
+    // The dialog covers the whole screen: a click on its empty parts (around
+    // the image, the counter) is a click beside the image.
+    viewer.addEventListener('click', (event) => {
+      if (event.target instanceof Element && !event.target.closest('img, button, figcaption')) {
+        viewer.close()
+      }
+    })
+
+    viewer.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') show(current - 1)
+      else if (event.key === 'ArrowRight') show(current + 1)
+    })
+
+    // A mostly horizontal one-finger swipe, unless the page is pinch-zoomed (the
+    // finger then pans the zoomed image).
+    let swipeStart: { x: number; y: number } | undefined
+    viewer.addEventListener(
+      'touchstart',
+      (event) => {
+        const touch = event.touches[0]
+        swipeStart =
+          event.touches.length === 1 && touch ? { x: touch.clientX, y: touch.clientY } : undefined
+      },
+      { passive: true }
+    )
+    viewer.addEventListener('touchend', (event) => {
+      const start = swipeStart
+      const touch = event.changedTouches[0]
+      swipeStart = undefined
+      if (!start || !touch || (window.visualViewport?.scale ?? 1) > 1) return
+      const dx = touch.clientX - start.x
+      const dy = touch.clientY - start.y
+      if (Math.abs(dx) > 50 && Math.abs(dx) > 2 * Math.abs(dy)) show(current + (dx < 0 ? 1 : -1))
+    })
+
+    // Back on the page, focus (and scroll to) the thumbnail of the last shot seen.
+    viewer.addEventListener('close', () => links[current]?.focus())
+  }
+</script>
+
+<style>
+  .gallery {
+    display: grid;
+    gap: var(--space-6) var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .shot {
+    margin: 0;
+  }
+  .shot__link {
+    position: relative;
+    display: block;
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    cursor: zoom-in;
+  }
+  .shot__link:hover {
+    box-shadow: 0 0 0 1px var(--color-accent-text);
+  }
+  .shot__link :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  /* Tells that the thumbnail opens larger, on touch screens too (no hover). */
+  .shot__zoom {
+    position: absolute;
+    right: var(--space-3);
+    bottom: var(--space-3);
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--color-surface) 85%, transparent);
+    color: var(--color-text);
+  }
+  .shot__link:hover .shot__zoom,
+  .shot__link:focus-visible .shot__zoom {
+    border-color: var(--color-accent-text);
+    color: var(--color-accent-text);
+  }
+  .shot__caption {
+    margin-top: var(--space-3);
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+  }
+
+  /* The page behind the viewer does not scroll (the gutter keeps its layout). */
+  :global(html:has(.viewer[open])) {
+    overflow: hidden;
+    scrollbar-gutter: stable;
+  }
+
+  /* The dialog covers the screen; the shot fills what the controls leave. */
+  .viewer {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: var(--space-4) var(--gutter);
+    border: 0;
+    background: transparent;
+    color: var(--color-text);
+  }
+  .viewer[open] {
+    display: grid;
+    grid-template:
+      'bar bar' auto
+      'shot shot' minmax(0, 1fr)
+      'previous next' auto
+      / 1fr 1fr;
+    gap: var(--space-4);
+  }
+  /* Custom properties reach ::backdrop only in recent browsers: fallbacks. */
+  .viewer::backdrop {
+    background: color-mix(in srgb, var(--color-bg, #0a0e14) 94%, transparent);
+    backdrop-filter: blur(8px);
+  }
+
+  .viewer__bar {
+    grid-area: bar;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+  .viewer__counter {
+    margin: 0;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  .viewer__button {
+    display: inline-grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+  }
+  .viewer__button:hover {
+    border-color: var(--color-accent-text);
+    color: var(--color-accent-text);
+  }
+  .viewer__previous {
+    grid-area: previous;
+    justify-self: start;
+  }
+  .viewer__next {
+    grid-area: next;
+    justify-self: end;
+  }
+
+  /* The image takes the room the caption leaves, at its own ratio. */
+  .viewer__slide {
+    grid-area: shot;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    justify-items: center;
+    gap: var(--space-3);
+    min-width: 0;
+    margin: 0;
+  }
+  /* The <img> is the grid item; Chrome's <source> elements would be ones too. */
+  .viewer__slide :global(picture) {
+    display: contents;
+  }
+  .viewer__slide :global(source) {
+    display: none;
+  }
+  .viewer__slide :global(img) {
+    align-self: center;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: 100%;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 1.5rem 3rem -1.5rem rgb(0 0 0 / 35%);
+  }
+  .viewer__caption {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-1) var(--space-3);
+    max-width: 48rem;
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+    text-align: center;
+  }
+  .viewer__url {
+    color: var(--color-accent-text);
+    font-family: var(--font-mono);
+  }
+
+  @media (min-width: 48rem) {
+    .gallery {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* Room enough for the arrows on each side of the shot. */
+    .viewer[open] {
+      grid-template:
+        'bar bar bar' auto
+        'previous shot next' minmax(0, 1fr)
+        / auto minmax(0, 1fr) auto;
+    }
+    .viewer__previous,
+    .viewer__next {
+      align-self: center;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .viewer[open] {
+      animation: viewer-in var(--dur-fast) var(--ease-out);
+    }
+    .viewer[open]::backdrop {
+      animation: viewer-fade var(--dur-fast, 150ms) ease-out;
+    }
+  }
+
+  @keyframes viewer-in {
+    from {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+  }
+  @keyframes viewer-fade {
+    from {
+      opacity: 0;
+    }
+  }
+</style>
